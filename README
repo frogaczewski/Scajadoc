@@ -1,0 +1,33 @@
+Scajadoc is an open source (LGPL licensed) javadoc generation tool.
+
+Tool is distributed with maven plugin.
+
+Building and executing Scajadoc.
+===============================================================================
+	1.) Build top level module first
+			mvn clean install
+
+	2.) Either run
+
+			java -jar Scajadoc with command lines parameters (TODO describe them)
+
+			or
+
+			add this entry to your pom.xml
+			
+			<plugin>
+				<groupId>org.scajadoc</groupId>
+				<artifactId>scajadoc-maven-plugin</artifactId>
+				<version>0.1-SNAPSHOT</version>
+				<configuration>
+					<destination>path to the target directory</destination>
+					<scalaVersion>2.8.1</scalaVersion>
+				</configuration>
+			</plugin>
+
+			and execute:
+			
+			mvn org.scajadoc:scajadoc-maven-plugin:scajadoc (TODO shorten this)
+			TODO automatic discovery of scala version
+			TODO destination = target/api
+This file was modified by IntelliJ IDEA 10.0.2 for binding GitHub repository

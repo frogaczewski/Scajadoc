@@ -1,0 +1,7 @@
+Scajadoc-test is a sample application written in scala. Aim of this application
+is to test proper behaviour of scajadoc-core and scajadoc-maven.
+
+Command line arguments for scajadoc:
+-sourcepath C:\Users\Filip\Desktop\PracaDyplomowa\ScajaDoc\scajadoc\test
+-classpath C:\Users\Filip\.m2\repository\org\scala-lang\scala-swing\2.8.1\scala-swing-2.8.1.jar
+-d C:\Users\Filip\Desktop\PracaDyplomowa\Testing\te

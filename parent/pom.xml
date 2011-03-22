@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.scajadoc</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<inceptionYear>2011</inceptionYear>
+	<name>Scajadoc Common Parent</name>
+	<description>Scajadoc common parent POM module</description>
+	<url>http://www.scajadoc.org</url>
+	<packaging>pom</packaging>
+
+	<properties>
+		<scala.version>2.8.1</scala.version>
+		<scala.test.version>1.6.6</scala.test.version>
+		<junit.version>4.4</junit.version>
+		<surefire.version>2.6</surefire.version>
+		<maven.plugin.api.version>2.0</maven.plugin.api.version>
+		<commmons.cli.version>1.2</commmons.cli.version>
+		<maven.dependency.tree.version>1.2</maven.dependency.tree.version>
+		<maven.testing>1.1</maven.testing>
+		<mockito.version>1.8.3</mockito.version>
+	</properties>
+	
+</project>
