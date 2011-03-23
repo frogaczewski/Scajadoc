@@ -28,7 +28,7 @@ object entityPresentationUtil {
 			/*<dl>{items map { case (t, d) => <dt>{ inlineToHtml(t) }</dt><dd>{ blockToHtml(d) }</dd> } }</dl> */
 		case HorizontalRule() =>
 				<hr/>
-  }
+	}
 
 	def inlineToHtml(inl: Inline): NodeSeq = inl match {
 		case Chain(items) => items flatMap (inlineToHtml(_))
@@ -60,6 +60,15 @@ object entityPresentationUtil {
 	def short(comment : Option[Comment]) = comment match {
 		case Some(comment) => entityPresentationUtil.inlineToHtml(comment.short).text
 		case None => ""
+	}
+
+
+	def params(executable : NonTemplateMemberEntity) = {
+		executable match {
+			case d : Def => methodParams(d.valueParams)
+			case c : Constructor => methodParams(c.valueParams)
+			case _ => ""
+		}
 	}
 
 	/**
@@ -115,5 +124,16 @@ object entityPresentationUtil {
 	def inType(entity : MemberEntity) = templateType(entity.inTemplate).toLowerCase
 
 	def inPackage(typ : DocTemplateEntity) = classpathCache(typ).packageCanonicalPath
+
+	/**
+	 * Returns name of the entity. In case of methods and constructors appends parameters
+	 * to the name.
+	 */
+	def entityName(entity : MemberEntity) = {
+		if (entity.isConstructor || entity.isDef)
+			entity.name + params(entity.asInstanceOf[NonTemplateMemberEntity])
+		else
+			entity.name
+	}
 
 }

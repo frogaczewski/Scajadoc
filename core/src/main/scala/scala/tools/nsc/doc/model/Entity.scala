@@ -90,6 +90,8 @@ trait DocTemplateEntity extends TemplateEntity with MemberEntity {
 /** A ''documentable'' trait. */
 trait Trait extends DocTemplateEntity with HigherKinded
 
+trait Annotation extends Trait with HigherKinded
+
 /** A ''documentable'' class. */
 trait Class extends Trait with HigherKinded {
   def primaryConstructor: Option[Constructor]

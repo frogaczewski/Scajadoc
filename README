@@ -1,6 +1,6 @@
 Scajadoc is an open source (LGPL licensed) javadoc generation tool.
 
-Tool is distributed with maven plugin.
+Tool is distributed along with the maven plugin.
 
 Building and executing Scajadoc.
 ===============================================================================

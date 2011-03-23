@@ -15,7 +15,7 @@ object classpathCache {
 	private val cache = new HashMap[MemberEntity, Classpath]
 
 	def apply(filename : String) : Classpath = {
-		new Classpath(null) {
+		new Classpath(null,null) {
 			override def canonicalClasspath = ""
 			override def packageCanonicalPath = ""
 			override def docPackageClasspath = "api" + separator
@@ -28,7 +28,7 @@ object classpathCache {
 		classpath match {
 			case Some(path) => path
 			case None => {
-				val path = new Classpath(entity.toRoot.reverse)
+				val path = new Classpath(entity.toRoot.reverse, entity)
 				cache += entity -> path
 				path
 			}
@@ -36,7 +36,14 @@ object classpathCache {
 	}
 }
 
-class Classpath (private val path : List[MemberEntity]) {
+class Classpath (private val path : List[MemberEntity], private val clpEntity : MemberEntity) {
+
+	/**
+	 * Returns true if the entity is a root package.
+	 */
+	private val isRootPackage : (MemberEntity => Boolean) =
+		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
+				&& entity.asInstanceOf[DocTemplateEntity].isRootPackage)
 
 	private val packageFilter : (MemberEntity => Boolean) =
 		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
@@ -71,9 +78,22 @@ class Classpath (private val path : List[MemberEntity]) {
 		&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage).map(_.name).mkString(separator)
 
 	/**
-	 * Returns relative path (from api base directory) to the entity.
+	 * Returns relative path (from api base directory) to (class, interface, enum, etc..) entity's
+	 * documentation.
 	 */
 	def docBaseFileClasspath() : String = path.filter(entity =>
 		entity.isInstanceOf[DocTemplateEntity]
 		&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage).map(_.name).mkString(separator)
+
+	/**
+	 * Returns relative path (from api base directory) to entity's documentation.
+	 */
+	def docBaseClasspath() : String = {
+		val base = docBaseFileClasspath + ".html#"
+		if (!clpEntity.isTemplate)
+			base + clpEntity.name + entityPresentationUtil.params(clpEntity.asInstanceOf[NonTemplateMemberEntity])
+		else
+			base
+	}
+
 }

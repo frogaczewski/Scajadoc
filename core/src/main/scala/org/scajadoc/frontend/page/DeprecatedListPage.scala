@@ -1,14 +1,15 @@
 package org.scajadoc.frontend.page
 
 import xml.Node
-import org.scajadoc.frontend.{entityPresentationUtil, entityTreeTraverser}
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
 import collection.mutable.HashMap
+import org.scajadoc.frontend.{classpathCache, entityPresentationUtil, entityTreeTraverser}
 
 /**
  * Generate deprecated-list.html file.
  *
  * @author Filip Rogaczewski
+ * @version 0.9
  */
 class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
@@ -21,17 +22,30 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 			case None => false
 		}
 
-	/**
-	 * Returns true if entity is an exception.
-	 */
-	val isException : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => t.linearizationTemplates.exists(_.qualifiedName == classOf[Exception].getCanonicalName)
+	private val isSubclassOf : ((DocTemplateEntity, Class[_]) => Boolean) =
+		(entity : DocTemplateEntity, clazz : Class[_]) =>
+				entity.linearizationTemplates.exists(_.qualifiedName == clazz.getCanonicalName)
 
 	/**
-	 * Returns true if entity is an error.
+	 * Returns true if the entity is an exception.
+	 */
+	val isException : (DocTemplateEntity => Boolean) =
+		(t : DocTemplateEntity) => isSubclassOf(t, classOf[java.lang.Exception])
+
+	/**
+	 * Returns true if the entity is an error.
 	 */
 	val isError : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => t.linearizationTemplates.exists(_.qualifiedName == classOf[Error].getCanonicalName)
+		(t : DocTemplateEntity) => isSubclassOf(t, classOf[java.lang.Error])
+
+	/**
+	 * Returns true if the entity is an annotation.
+	 */
+	val isAnnotation : (DocTemplateEntity => Boolean) =
+		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Annotation])
+
+	val isEnumeration : (DocTemplateEntity => Boolean) =
+		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Enumeration])
 
 	/**
 	 * Returns true if entity is a deprecated class.
@@ -42,40 +56,52 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	 *  - enums
 	 */
 	val collectDeprecatedClasses : (MemberEntity => Boolean) =
-		(t : MemberEntity) => (t.isTemplate
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isTemplate
 			&& !t.asInstanceOf[DocTemplateEntity].isPackage
+			&& !t.asInstanceOf[DocTemplateEntity].isTrait
 			&& !isException(t.asInstanceOf[DocTemplateEntity])
-			&& deprecated(t))
+			&& !isAnnotation(t.asInstanceOf[DocTemplateEntity])
+			&& !isEnumeration(t.asInstanceOf[DocTemplateEntity])
+			&& !isError(t.asInstanceOf[DocTemplateEntity]))
 
 	/**
-	 * Returns true if entity is deprecated field.
+	 * Returns true if the entity is a deprecated field.
 	 */
 	val collectDeprecatedFields : (MemberEntity => Boolean) =
-		(t : MemberEntity) => ((t.isVal || t.isVar) && deprecated(t))
+		(t : MemberEntity) => (deprecated(t)
+			&& !isEnumeration(t.inTemplate)
+			&& (t.isVal || t.isVar))
 
 	val collectDeprecatedConstructors : (MemberEntity => Boolean) =
 		(t : MemberEntity) => t.isConstructor && deprecated(t)
 
 	/**
-	 * Returns true if entity is deprecated method.
+	 * Returns true if the entity is a deprecated method.
 	 */
 	val collectDeprecatedMethods : (MemberEntity => Boolean) =
-		(t : MemberEntity) => (deprecated(t) && t.isDef)
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isDef
+			&& !t.isConstructor
+			&& !isAnnotation(t.inTemplate))
 
 	/**
-	 * TODO implement.
-	 */
-	val collectDeprecatedAnnotationElements : (MemberEntity => Boolean) =
-		(t : MemberEntity) => false && deprecated(t)
-
-	/**
-	 * TODO implement.
+	 * Returns true if the entity is a deprecated trait.
 	 */
 	val collectDeprecatedInterfaces : (MemberEntity => Boolean) =
-		(t : MemberEntity) => (false && deprecated(t))
+		(t : MemberEntity) => (deprecated(t)
+				&& t.isInstanceOf[DocTemplateEntity]
+				&& t.asInstanceOf[DocTemplateEntity].isTrait)
 
 	/**
-	 * Returns true if entity is deprecated exception.
+	 * Returns true if the entity is deprecated element of an annotation.
+	 * Deprecated elements of annotations are defs which are defined within the annotation.
+	 */
+	val collectDeprecatedAnnotationElements : (MemberEntity => Boolean) =
+		(t : MemberEntity) => deprecated(t) && isAnnotation(t.inTemplate)
+
+	/**
+	 * Returns true if the entity is a deprecated exception.
 	 */
 	val collectDeprecatedExceptions : (MemberEntity => Boolean) =
 		(t : MemberEntity) => (deprecated(t)
@@ -83,38 +109,50 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 			&& isException(t.asInstanceOf[DocTemplateEntity]))
 
 	/**
-	 * Returns true if entity is deprecated error.
+	 * Returns true if the entity is a deprecated error.
 	 */
 	val collectDeprecatedErrors : (MemberEntity => Boolean) =
-		(t : MemberEntity) => deprecated(t) && false
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isInstanceOf[DocTemplateEntity]
+			&& isException(t.asInstanceOf[DocTemplateEntity]))
 
 	/**
-	 * TODO implement.
+	 * Returns true if the entity is a deprecated annotation.
 	 */
 	val collectDeprecatedAnnotations : (MemberEntity => Boolean) =
-		(t : MemberEntity) => deprecated(t) && false
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isInstanceOf[DocTemplateEntity]
+			&& isAnnotation(t.asInstanceOf[DocTemplateEntity]))
 
 	/**
-	 * TODO implement.
+	 * Returns true if the entity is a deprecated enum.
 	 */
 	val collectDeprecatedEnums : (MemberEntity => Boolean) =
-		(t : MemberEntity) => deprecated(t) && false
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isInstanceOf[DocTemplateEntity]
+			&& isEnumeration(t.asInstanceOf[DocTemplateEntity]))
 
+	/**
+	 * Returns true if the entity is a deprecated enum constant.
+	 */
 	val collectDeprecatedEnumConstants : (MemberEntity => Boolean) =
-		(t : MemberEntity) => deprecated(t) && false
-	
-	lazy val deprecatedApi : Map[DeprecatedType, (MemberEntity => Boolean)] =
-		Map((DeprecatedType("class", "Deprecated Classes") -> collectDeprecatedClasses),
-			(DeprecatedType("interface","Deprecated Interfaces") -> collectDeprecatedInterfaces),
-			(DeprecatedType("exception", "Deprecared Exceptions") -> collectDeprecatedExceptions),
-			(DeprecatedType("field", "Deprecated Fields") -> collectDeprecatedFields),
-			(DeprecatedType("method", "Deprecated Methods") -> collectDeprecatedMethods),
-			(DeprecatedType("constructor", "Deprecated Constructors") -> collectDeprecatedConstructors),
-			(DeprecatedType("annotation_type_member", "Deprecated Annotation Type Elements") -> collectDeprecatedAnnotationElements),
-			(DeprecatedType("annotation_type", "Deprecated Annotations") -> collectDeprecatedAnnotations),
-			(DeprecatedType("enum", "Deprecated Enums") -> collectDeprecatedEnums),
-			(DeprecatedType("enum_constant", "Deprecated Enum Constants") -> collectDeprecatedEnumConstants)
-		)
+		(t : MemberEntity) => (deprecated(t)
+			&& t.isVal && isEnumeration(t.inTemplate.asInstanceOf[DocTemplateEntity]))
+
+	/**
+	 * Map with deprecated sections and functions for collecting deprecated entities.
+	 */
+	lazy val deprecatedApi : Map[DeprecatedType, (MemberEntity => Boolean)] = Map(
+		(DeprecatedType("class", "Deprecated Classes") -> collectDeprecatedClasses),
+		(DeprecatedType("interface","Deprecated Interfaces") -> collectDeprecatedInterfaces),
+		(DeprecatedType("exception", "Deprecared Exceptions") -> collectDeprecatedExceptions),
+		(DeprecatedType("field", "Deprecated Fields") -> collectDeprecatedFields),
+		(DeprecatedType("method", "Deprecated Methods") -> collectDeprecatedMethods),
+		(DeprecatedType("constructor", "Deprecated Constructors") -> collectDeprecatedConstructors),
+		(DeprecatedType("annotation_type_member", "Deprecated Annotation Type Elements") -> collectDeprecatedAnnotationElements),
+		(DeprecatedType("annotation_type", "Deprecated Annotations") -> collectDeprecatedAnnotations),
+		(DeprecatedType("enum", "Deprecated Enums") -> collectDeprecatedEnums),
+		(DeprecatedType("enum_constant", "Deprecated Enum Constants") -> collectDeprecatedEnumConstants))
 
 	var deprecatedEntities = new HashMap[DeprecatedType, List[MemberEntity]]
 
@@ -138,16 +176,19 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
 	private def deprecatedEntity(typ : DeprecatedType, entities : List[MemberEntity]) = {
 		var cls = Nil:List[Node]
-		cls ++= <a name={typ.anchor}><!-- --></a>
-		cls ++= <table border="1" width="100%" cellpadding="3" cellspacing="0" summary=""><tr bgcolor="#CCCCFF" class="TableHeadingColor"><th align="left" colspan="2"><font size="+2"><b>{typ.heading}</b></font></th></tr>
+		cls ++= <p><a name={typ.anchor}><!-- --></a>
+		<table border="1" width="100%" cellpadding="3" cellspacing="0" summary=""><tr bgcolor="#CCCCFF" class="TableHeadingColor"><th align="left" colspan="2"><font size="+2"><b>{typ.heading}</b></font></th></tr>
 			{entities.map(deprecatedToHtml(_))}
-		</table>
+		</table></p>
 		cls
 	}
 
 	private def deprecatedToHtml(entity : MemberEntity) =
-		<tr bgcolor="white" class="TableRowColor"><td>{entity.name} {entityPresentationUtil.bodyToHtml(entity.deprecation.get)}</td></tr>
+		<tr bgcolor="white" class="TableRowColor"><td><a href={classpathCache(entity).docBaseClasspath}>{entityPresentationUtil.entityName(entity)}</a> {entityPresentationUtil.bodyToHtml(entity.deprecation.get)}</td></tr>
 
+	/**
+	 * Returns page title and menu with deprecated sections. 
+	 */
 	private def header() =
 		<hr />
 			<center><h2><b>Deprecated API</b></h2></center>
