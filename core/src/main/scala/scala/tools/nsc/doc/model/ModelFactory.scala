@@ -203,6 +203,10 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       }
       tpls zip tps
     }
+	  def interfaces = {
+		  sym.ancestors.filter(s => s.isInterface || s.isTrait).map(makeTemplate(_))
+		  //sym.info.baseClasses.filter(_.isInterface).map(makeTemplate(_))
+	  }
     def linearizationTemplates = linearization map { _._1 }
     def linearizationTypes = linearization map { _._2 }
     private lazy val subClassesCache = mutable.Buffer.empty[DocTemplateEntity]

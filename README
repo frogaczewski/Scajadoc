@@ -30,4 +30,3 @@ Building and executing Scajadoc.
 			mvn org.scajadoc:scajadoc-maven-plugin:scajadoc (TODO shorten this)
 			TODO automatic discovery of scala version
 			TODO destination = target/api
-This file was modified by IntelliJ IDEA 10.0.2 for binding GitHub repository

@@ -3,7 +3,7 @@ package org.scajadoc.frontend.page
 import xml.Node
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
 import collection.mutable.HashMap
-import org.scajadoc.frontend.{classpathCache, entityPresentationUtil, entityTreeTraverser}
+import org.scajadoc.frontend._
 
 /**
  * Generate deprecated-list.html file.
@@ -13,6 +13,8 @@ import org.scajadoc.frontend.{classpathCache, entityPresentationUtil, entityTree
  */
 class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
+	import entityQueryContainer._
+
 	/**
 	 * Returns true if entity is deprecated. 
 	 */
@@ -21,31 +23,6 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 			case Some(b) => true
 			case None => false
 		}
-
-	private val isSubclassOf : ((DocTemplateEntity, Class[_]) => Boolean) =
-		(entity : DocTemplateEntity, clazz : Class[_]) =>
-				entity.linearizationTemplates.exists(_.qualifiedName == clazz.getCanonicalName)
-
-	/**
-	 * Returns true if the entity is an exception.
-	 */
-	val isException : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => isSubclassOf(t, classOf[java.lang.Exception])
-
-	/**
-	 * Returns true if the entity is an error.
-	 */
-	val isError : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => isSubclassOf(t, classOf[java.lang.Error])
-
-	/**
-	 * Returns true if the entity is an annotation.
-	 */
-	val isAnnotation : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Annotation])
-
-	val isEnumeration : (DocTemplateEntity => Boolean) =
-		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Enumeration])
 
 	/**
 	 * Returns true if entity is a deprecated class.

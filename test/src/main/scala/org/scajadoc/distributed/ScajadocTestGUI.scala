@@ -16,11 +16,7 @@ class ScajadocTestGUI {
 }
 
 @deprecated
-class algorithm extends ClassfileAnnotation {
-
-	@deprecated
-	def name : String
-}
+class algorithm(val name : String) extends ClassfileAnnotation
 
 @deprecated
 object SupportedAlgorithm extends Enumeration {

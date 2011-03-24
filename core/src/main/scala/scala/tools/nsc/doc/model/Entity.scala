@@ -85,6 +85,7 @@ trait DocTemplateEntity extends TemplateEntity with MemberEntity {
   def abstractTypes: List[AbstractType]
   def aliasTypes: List[AliasType]
   def companion: Option[DocTemplateEntity]
+	def interfaces : List[TemplateEntity]
 }
 
 /** A ''documentable'' trait. */

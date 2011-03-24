@@ -63,6 +63,10 @@ object entityPresentationUtil {
 	}
 
 
+	/**
+	 * Returns parameters of the entity.
+	 * TODO generic handling
+	 */
 	def params(executable : NonTemplateMemberEntity) = {
 		executable match {
 			case d : Def => methodParams(d.valueParams)

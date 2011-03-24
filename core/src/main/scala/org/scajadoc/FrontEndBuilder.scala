@@ -1,14 +1,17 @@
 package org.scajadoc
 
-import frontend.htmlPageWriter
 import frontend.page._
+import frontend.{entityQueryContainer, entityTreeTraverser, htmlPageWriter}
 import tools.nsc.doc.Universe
+import tools.nsc.doc.model.DocTemplateEntity
 
 /**
  *
  * @author Filip Rogaczewski
  */
 class FrontEndBuilder(val universe : Universe) {
+
+	import entityQueryContainer._
 
 	lazy val indexPages = {
 		var pages = Nil:List[HtmlPage]
@@ -31,6 +34,10 @@ class FrontEndBuilder(val universe : Universe) {
 		}) */
 //		documentableEntityMap.map(universe.rootPackage)
 		indexPages.foreach(page => htmlPageWriter.write(page))
+		entityTreeTraverser.collect(universe.rootPackage, isType).foreach(entity =>
+			htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
+		)
+//		entityTreeTraverser.collect(universe.rootPackage, isType)
 	}
 
 }

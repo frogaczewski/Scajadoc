@@ -36,24 +36,13 @@ object classpathCache {
 	}
 }
 
+/**
+ * Encapsulation of classpath. 
+ */
 class Classpath (private val path : List[MemberEntity], private val clpEntity : MemberEntity) {
 
-	/**
-	 * Returns true if the entity is a root package.
-	 */
-	private val isRootPackage : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
-				&& entity.asInstanceOf[DocTemplateEntity].isRootPackage)
-
-	private val packageFilter : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
-				&& entity.asInstanceOf[DocTemplateEntity].isPackage
-				&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage)
-
-	private val classAndPackageFilter : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
-				&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage)
-
+	import entityQueryContainer._
+	
 	/**
 	 * Returns canonical classpath of the member entity.
 	 */
@@ -62,13 +51,13 @@ class Classpath (private val path : List[MemberEntity], private val clpEntity : 
 	/**
 	 * Returns canonical classpath of the member's package.
 	 */
-	def packageCanonicalPath() : String = path.filter(packageFilter).map(_.name).mkString(".")
+	def packageCanonicalPath() : String = path.filter(isPackage).map(_.name).mkString(".")
 
 	/**
 	 * Returns path to the documentation of this template's package.
 	 */
 	def docPackageClasspath() : String = "api" + separator +
-			path.filter(packageFilter).map(_.name).mkString(separator)
+			path.filter(isPackage).map(_.name).mkString(separator)
 
 	/**
 	 * Returns path to the documentation of this template.
@@ -82,11 +71,10 @@ class Classpath (private val path : List[MemberEntity], private val clpEntity : 
 	 * documentation.
 	 */
 	def docBaseFileClasspath() : String = path.filter(entity =>
-		entity.isInstanceOf[DocTemplateEntity]
-		&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage).map(_.name).mkString(separator)
+		entity.isInstanceOf[DocTemplateEntity] && !isRootPackage(entity)).map(_.name).mkString(separator)
 
 	/**
-	 * Returns relative path (from api base directory) to entity's documentation.
+	 * Returns a relative path (from api base directory) to the entity's documentation.
 	 */
 	def docBaseClasspath() : String = {
 		val base = docBaseFileClasspath + ".html#"
