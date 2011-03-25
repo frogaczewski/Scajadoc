@@ -204,7 +204,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       tpls zip tps
     }
 	  def interfaces = {
-		  sym.ancestors.filter(s => s.isInterface || s.isTrait).map(makeTemplate(_))
+		  val directParents = sym.info.parents.map(_.typeSymbol)
+		  val acss = sym.ancestors.filter(s => (s.isTrait || s.isInterface)).map(makeTemplate(_))
+		  sym.info.parents.map(_.typeSymbol).filter(s => (s.isInterface || s.isTrait)).map(makeTemplate(_))
 		  //sym.info.baseClasses.filter(_.isInterface).map(makeTemplate(_))
 	  }
     def linearizationTemplates = linearization map { _._1 }
@@ -282,8 +284,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
   def normalizeTemplate(aSym: Symbol): Symbol = aSym match {
     case null | EmptyPackage | NoSymbol =>
       normalizeTemplate(RootPackage)
-    case ScalaObjectClass | ObjectClass =>
-      normalizeTemplate(AnyRefClass)
+    /*case ScalaObjectClass | ObjectClass =>
+      normalizeTemplate(AnyRefClass) */
     case _ if aSym.isModuleClass || aSym.isPackageObject =>
       normalizeTemplate(aSym.sourceModule)
     case _ =>
