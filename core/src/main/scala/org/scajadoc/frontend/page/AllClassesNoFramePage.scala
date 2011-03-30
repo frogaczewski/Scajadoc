@@ -12,7 +12,7 @@ class AllClassesNoFramePage(rootPackage : ScalaPackage) extends AbstractAllClass
 	/**
 	 * Name of the output file.
 	 */
-	def filename = "allclasses-noframe.html"
+	def filename = "allclasses-noframe"
 
 	def headers = ""
 

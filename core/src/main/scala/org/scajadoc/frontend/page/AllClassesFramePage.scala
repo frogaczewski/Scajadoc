@@ -12,7 +12,7 @@ class AllClassesFramePage(rootPackage : ScalaPackage) extends AbstractAllClasses
 	/**
 	 * Name of the output file.
 	 */
-	def filename = "allclasses-frame.html"
+	def filename = "allclasses-frame"
 
 	def headers = ""
 

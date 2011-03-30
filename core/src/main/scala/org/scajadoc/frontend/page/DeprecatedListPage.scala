@@ -133,7 +133,7 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
 	var deprecatedEntities = new HashMap[DeprecatedType, List[MemberEntity]]
 
-	def filename = "deprecated-list.html"
+	def filename = "deprecated-list"
 
 	def pageTitle = "Deprecated List"
 

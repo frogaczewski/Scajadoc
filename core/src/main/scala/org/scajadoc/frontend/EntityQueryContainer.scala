@@ -1,6 +1,6 @@
 package org.scajadoc.frontend
 
-import tools.nsc.doc.model.{MemberEntity, DocTemplateEntity}
+import tools.nsc.doc.model.{Entity, MemberEntity, DocTemplateEntity}
 
 /**
  * Container holding basic entity queries. 
@@ -12,15 +12,15 @@ object entityQueryContainer {
 	/**
 	 * Returns true if the entity is a root package.
 	 */
-	val isRootPackage : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
+	val isRootPackage : (Entity => Boolean) =
+		(entity : Entity) => (entity.isInstanceOf[DocTemplateEntity]
 				&& entity.asInstanceOf[DocTemplateEntity].isRootPackage)
 
 	/**
 	 * Returns true if the entity is a package.
 	 */
-	val isPackage : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
+	val isPackage : (Entity => Boolean) =
+		(entity : Entity) => (entity.isInstanceOf[DocTemplateEntity]
 				&& entity.asInstanceOf[DocTemplateEntity].isPackage
 				&& !isRootPackage(entity))
 

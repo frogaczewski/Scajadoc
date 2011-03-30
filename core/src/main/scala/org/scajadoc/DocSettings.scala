@@ -8,6 +8,13 @@ import collection.JavaConversions._
 
 object settings extends Settings(msg => error(msg)) {
 
+   final val outputFormat = ".html"
+
+   /*
+    * Important! all the links must end with '/'.
+    */
+   var links : List[String] = Nil:List[String]
+
 	var javadocTitle : String = _
 
 	def setSourcepath(sourcepath : List[String]) =
@@ -19,6 +26,7 @@ object settings extends Settings(msg => error(msg)) {
 			throw new Exception("Wrong destination directory"))
 
 	def setJavadocTitle(title : String) = this.javadocTitle = title
+   
 }
 
 /**
@@ -86,6 +94,8 @@ class DocSettings {
 	var docDestinationDir : Option[String] = None
 
 	var javadocTitle : String = _
+
+   var links : List[String] = Nil:List[String]
 
 	/**
 	 * Processes command line arguments and finds options values.

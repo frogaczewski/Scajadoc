@@ -12,7 +12,7 @@ import java.io.File._
  */
 object classpathCache {
 
-	private val cache = new HashMap[MemberEntity, Classpath]
+	private val cache = new HashMap[Entity, Classpath]
 
 	def apply(filename : String) : Classpath = {
 		new Classpath(null,null) {
@@ -23,9 +23,8 @@ object classpathCache {
 		}
 	}
 
-	def apply(entity : MemberEntity) : Classpath = {
-		val classpath = cache.get(entity)
-		classpath match {
+	def apply(entity : Entity) : Classpath = {
+		cache.get(entity) match {
 			case Some(path) => path
 			case None => {
 				val path = new Classpath(entity.toRoot.reverse, entity)
@@ -39,7 +38,7 @@ object classpathCache {
 /**
  * Encapsulation of classpath. 
  */
-class Classpath (private val path : List[MemberEntity], private val clpEntity : MemberEntity) {
+class Classpath (private val path : List[Entity], private val clpEntity : Entity) {
 
 	import entityQueryContainer._
 	
@@ -48,9 +47,15 @@ class Classpath (private val path : List[MemberEntity], private val clpEntity : 
 	 */
 	def canonicalClasspath() : String = path.map(entity => entity.name).mkString(".")
 
-	/**
-	 * Returns canonical classpath of the member's package.
-	 */
+   /**
+    *
+    */
+   def canonicalFileClasspath() : String = path.map(_.name).mkString("/")
+
+
+   /**
+    *  Returns canonical classpath of the member's package.
+    */
 	def packageCanonicalPath() : String = path.filter(isPackage).map(_.name).mkString(".")
 
 	/**
@@ -75,10 +80,13 @@ class Classpath (private val path : List[MemberEntity], private val clpEntity : 
 
 	/**
 	 * Returns a relative path (from api base directory) to the entity's documentation.
+    *
+    * TODO move this functionality to LinkResolver.
 	 */
+   @deprecated
 	def docBaseClasspath() : String = {
 		val base = docBaseFileClasspath + ".html#"
-		if (!clpEntity.isTemplate)
+		if (clpEntity.isInstanceOf[NonTemplateMemberEntity])
 			base + clpEntity.name + entityPresentationUtil.params(clpEntity.asInstanceOf[NonTemplateMemberEntity])
 		else
 			base

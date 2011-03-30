@@ -24,7 +24,7 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	val collectCondition : (MemberEntity => Boolean) =
 		(t : MemberEntity) => t.isDef || t.isConstructor || t.isVal || t.isTemplate || t.isVar
 
-	def filename = "index-all.html"
+	def filename = "index-all"
 
 	def pageTitle = "Index"
 

@@ -17,13 +17,20 @@ import model.{ RootPackage => RootPackageEntity }
 class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory: ModelFactory with CommentFactory with TreeFactory =>
 
   import global._
-  import definitions.{ ObjectClass, ScalaObjectClass, RootPackage, EmptyPackage, NothingClass, AnyClass, AnyRefClass }
+  import definitions._
 
   private var droppedPackages = 0
   def templatesCount = templatesCache.size - droppedPackages
 
   private var modelFinished = false
   private var universe: Universe = null
+
+   /** Annotations that defines inheritance of interfaces. */
+   lazy val interfaceAnnotationMap : Map[Symbol, Symbol] = Map(
+      (definitions.getClass("scala.cloneable") -> definitions.getClass("java.lang.Cloneable")),
+      (definitions.getClass("scala.remote") -> definitions.getClass("java.rmi.Remote")),
+      (definitions.getClass("scala.serializable") -> definitions.getClass("java.io.Serializable"))
+   )
   
   /**  */
   def makeModel: Universe = {
@@ -204,10 +211,17 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       tpls zip tps
     }
 	  def interfaces = {
-		  val directParents = sym.info.parents.map(_.typeSymbol)
-		  val acss = sym.ancestors.filter(s => (s.isTrait || s.isInterface)).map(makeTemplate(_))
-		  sym.info.parents.map(_.typeSymbol).filter(s => (s.isInterface || s.isTrait)).map(makeTemplate(_))
-		  //sym.info.baseClasses.filter(_.isInterface).map(makeTemplate(_))
+        sym.info.parents
+              .map(_.typeSymbol)
+              .filter(s => (s.isInterface || s.isTrait))
+              .map(makeTemplate(_)) ++
+        interfaceAnnotationMap.filter(entry => sym.hasAnnotation(entry._1))
+              .map(entry => makeTemplate(entry._2))
+	  }
+	  def enclosingClass = {
+		  if (!sym.owner.isPackage && !sym.owner.isPackageClass)
+		    Some(makeTemplate(sym.owner).asInstanceOf[DocTemplateEntity])
+		  else None
 	  }
     def linearizationTemplates = linearization map { _._1 }
     def linearizationTypes = linearization map { _._2 }

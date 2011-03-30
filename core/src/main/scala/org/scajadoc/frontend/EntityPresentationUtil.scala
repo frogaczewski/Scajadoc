@@ -3,6 +3,7 @@ package org.scajadoc.frontend
 import xml.NodeSeq
 import tools.nsc.doc.model.comment._
 import tools.nsc.doc.model._
+import tools.nsc.doc.model.comment.{Link => ModelLink}
 
 /**
  * Utility class with methods for presenting entity on html page. 
@@ -37,7 +38,7 @@ object entityPresentationUtil {
 		case Underline(in) => <u>{ inlineToHtml(in) }</u>
 		case Superscript(in) => <sup>{ inlineToHtml(in) }</sup>
 		case Subscript(in) => <sub>{ inlineToHtml(in) }</sub>
-		case Link(raw, title) => <a href={ raw }>{ inlineToHtml(title) }</a>
+		case ModelLink(raw, title) => <a href={ raw }>{ inlineToHtml(title) }</a>
 		case EntityLink(entity) => {null}
 		case Monospace(text) => <code>{ xml.Text(text) }</code>
 		case Text(text) => xml.Text(text)

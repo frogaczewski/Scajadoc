@@ -17,7 +17,7 @@ class ConstantValuesPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	final val collectConstants : (MemberEntity => Boolean) =
 		(entity : MemberEntity) => entity.isInstanceOf[ConstantVal]
 
-	def filename = "constant-values.html"
+	def filename = "constant-values"
 
 	def pageTitle = "Constant Field Values"
 

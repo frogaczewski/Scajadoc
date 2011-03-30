@@ -17,7 +17,7 @@ object htmlPageWriter {
 		val dir = new JFile(settings.outdir.value + JFile.separator + classpath.docPackageClasspath)
 		if (!dir.exists)
 			dir.mkdirs
-		val file = new JFile(dir, page.filename)
+		val file = new JFile(dir, page.file)
 		if (!file.exists)
 			file.createNewFile
 		file
