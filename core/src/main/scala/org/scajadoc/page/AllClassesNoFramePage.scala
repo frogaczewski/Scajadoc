@@ -1,4 +1,4 @@
-package org.scajadoc.frontend.page
+package org.scajadoc.page
 
 import tools.nsc.doc.model.{Package => ScalaPackage}
 

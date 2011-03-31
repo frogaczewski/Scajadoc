@@ -1,9 +1,6 @@
-package org.scajadoc.frontend.page
+package org.scajadoc.page
 
-import java.nio.channels.Channels
-import java.io.{File, FileOutputStream}
 import xml.NodeSeq
-import org.scajadoc.frontend.Classpath
 import tools.nsc.doc.model.MemberEntity
 import org.scajadoc.settings
 
@@ -35,7 +32,7 @@ trait HtmlPage {
 
 	def filename : String
 
-   def file = filename + settings.outputFormat
+   def file = filename + settings.OUTPUT_FORMAT
 
 	def html =
 		<html>

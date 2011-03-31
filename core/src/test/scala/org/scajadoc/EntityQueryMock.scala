@@ -1,6 +1,6 @@
 package org.scajadoc
 
-import frontend.page.SingleIndexPage
+import page.SingleIndexPage
 import org.specs.Specification
 import tools.nsc.doc.model.DocTemplateEntity
 import org.junit.runner.RunWith
@@ -11,6 +11,8 @@ import org.specs.mock.{Mockito}
 class EntityQueryMockRunAsTest extends JUnit4(entityQueryMock)
 
 /**
+ * Unit tests for entity queries.
+ *
  * @author Filip Rogaczewski
  */
 object entityQueryMock extends Specification("Specification of the entity queries") with Mockito {

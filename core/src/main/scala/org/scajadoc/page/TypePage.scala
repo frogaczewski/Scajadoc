@@ -1,8 +1,8 @@
-package org.scajadoc.frontend.page
+package org.scajadoc.page
 
 import xml.Node
 import tools.nsc.doc.model.{TemplateEntity, DocTemplateEntity, Package => ScalaPackage}
-import org.scajadoc.frontend.{linkResolver, entityQueryContainer, entityPresentationUtil, classpathCache}
+import org.scajadoc.{linkResolver, entityQueryContainer, entityPresentationUtil, classpathCache}
 
 /**
  * @author Filip Rogaczewski
@@ -25,23 +25,14 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
 		body
 	}
 
-   private def linkable(template : TemplateEntity) : Boolean = true
-
-   private def makeTypeReference(template : TemplateEntity) = {
-      /* if (linkable(template))
-         //<a href={linkResolver.resolve(template).get.absoluteLink}>{template.name}</a>
-      else */template.name
-   }
-
 	private def classesInheritanceTree() = {
-      template.linearizationTemplates.filter(!_.isTrait).filter(!_.isInstanceOf[DocTemplateEntity]).foreach(e => println(e.qualifiedName))
-		template.linearizationTemplates.filter(!_.isTrait).map(makeTypeReference(_))
+		//template.linearizationTemplates.filter(!_.isTrait).map(makeTypeReference(_))
+      ""
 	}
 
 	private def allImplementedInterfaces() = {
-		val interfaces = template.interfaces
-      interfaces.filter(!_.isInstanceOf[DocTemplateEntity]).foreach(e => println(e.qualifiedName))
-      interfaces.map(makeTypeReference(_)).mkString(",")
+      //interfaces.map(makeTypeReference(_)).mkString(",")
+      ""
 	}
 
 	private def allSuperinterfaces() = {
@@ -49,11 +40,13 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
 	}
 
 	private def allKnownImplementingClasses() = {
-		template.subClasses.filter(!_.isTrait).map(makeTypeReference(_)).mkString(",")
+//		template.subClasses.filter(!_.isTrait).map(makeTypeReference(_)).mkString(",")
+      ""
 	}
 
 	private def directKnownSubclasses() = {
-		template.subClasses.filter(!_.isTrait).map(makeTypeReference(_)).mkString(",")
+//		template.subClasses.filter(!_.isTrait).map(makeTypeReference(_)).mkString(",")
+      ""
 	}
 
 	private def enclosingClass() = {

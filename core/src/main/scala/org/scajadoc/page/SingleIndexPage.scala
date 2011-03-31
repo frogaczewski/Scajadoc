@@ -1,8 +1,8 @@
-package org.scajadoc.frontend
-package page
+package org.scajadoc.page
 
 import xml.{Node, Elem}
 import tools.nsc.doc.model.{DocTemplateEntity, Val, Def, Constructor, MemberEntity, Package => ScalaPackage}
+import org.scajadoc.{entityTreeTraverser, entityPresentationUtil}
 
 /**
  * Generate index-all.html file.  

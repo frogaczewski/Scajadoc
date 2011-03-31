@@ -1,4 +1,4 @@
-package org.scajadoc.frontend
+package org.scajadoc
 
 import xml.NodeSeq
 import tools.nsc.doc.model.comment._

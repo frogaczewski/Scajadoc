@@ -28,6 +28,7 @@ object Scajadoc {
 		settings.setOutdir(docSettings.docDestinationDir)
 		settings.setSourcepath(docSettings.sourcepath)
 		settings.setJavadocTitle(docSettings.javadocTitle)
+      settings.setLinks(docSettings.links)
 		val reporter = new ConsoleReporter(settings) {
 			override def hasErrors = false
 		}

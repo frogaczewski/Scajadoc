@@ -47,13 +47,11 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) { processor
     * previous calls to the same processor.
     * @param files The list of paths (relative to the compiler's source path, or absolute) of files to document. */
   def universe(files: List[String]): Option[Universe] = {
-	  println("executing my code")
     (new compiler.Run()) compile files
     compiler.addSourceless
     assert(settings.docformat.value == "html")
     if (!reporter.hasErrors) {
       val modelFactory = (new model.ModelFactory(compiler, settings) with model.comment.CommentFactory with model.TreeFactory)
-      println("model contains " + modelFactory.templatesCount + " documentable templates")
       Some(modelFactory.makeModel)
     }
     else None

@@ -1,11 +1,11 @@
 package org.scajadoc
 
-import frontend.page.DeprecatedListPage
+import page.DeprecatedListPage
 import org.junit.runner.RunWith
 import org.specs.runner.{JUnit4, JUnitSuiteRunner}
 import org.specs.Specification
 import org.specs.mock.{Mockito}
-import tools.nsc.doc.model.MemberEntity
+import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity}
 
 /**
  * @author Filip Rogaczewski
@@ -20,6 +20,11 @@ object deprecatedListPageTest extends Specification("Specification of deprecated
 	"Deprecated list page" should {
 		doBefore {
 			mockedTemplate = mock[MemberEntity]
+         mockedTemplate.inTemplate returns {
+            val inTemp = mock[DocTemplateEntity]
+            inTemp.linearizationTemplates returns Nil
+            inTemp
+         }
 		}
 		"collect deprecated methods" in {
 			mockedTemplate.deprecation returns Some(null)

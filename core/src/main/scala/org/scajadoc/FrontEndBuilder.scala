@@ -1,7 +1,6 @@
 package org.scajadoc
 
-import frontend.page._
-import frontend.{entityQueryContainer, entityTreeTraverser, htmlPageWriter}
+import page._
 import tools.nsc.doc.Universe
 import tools.nsc.doc.model.DocTemplateEntity
 

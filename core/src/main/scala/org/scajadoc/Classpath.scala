@@ -1,4 +1,4 @@
-package org.scajadoc.frontend
+package org.scajadoc
 
 import tools.nsc.doc.model._
 import collection.mutable.HashMap
@@ -57,6 +57,11 @@ class Classpath (private val path : List[Entity], private val clpEntity : Entity
     *  Returns canonical classpath of the member's package.
     */
 	def packageCanonicalPath() : String = path.filter(isPackage).map(_.name).mkString(".")
+
+   /**
+    * Returns file-format of the member's package classpath.
+    */
+   def packageFilePath() : String = path.filter(isPackage).map(_.name).mkString("/")
 
 	/**
 	 * Returns path to the documentation of this template's package.

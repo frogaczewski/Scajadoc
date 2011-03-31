@@ -1,18 +1,20 @@
 package org.scajadoc
 
-import org.apache.commons.cli.{CommandLine, BasicParser, Options}
+import org.apache.commons.cli.{CommandLine, BasicParser, Options, Option => CliOption}
 import java.io.File
 import tools.nsc.io.Directory
 import tools.nsc.doc.Settings
 import collection.JavaConversions._
+import io.Source
+import java.net.URL
+import collection.mutable.ListBuffer
 
 object settings extends Settings(msg => error(msg)) {
 
-   final val outputFormat = ".html"
+   final val OUTPUT_FORMAT = ".html"
 
-   /*
-    * Important! all the links must end with '/'.
-    */
+   final val PACKAGE_LIST_FILE = "package-list"
+
    var links : List[String] = Nil:List[String]
 
 	var javadocTitle : String = _
@@ -26,7 +28,9 @@ object settings extends Settings(msg => error(msg)) {
 			throw new Exception("Wrong destination directory"))
 
 	def setJavadocTitle(title : String) = this.javadocTitle = title
-   
+
+   def setLinks(lnks : List[String]) = this.links = lnks
+
 }
 
 /**
@@ -61,6 +65,9 @@ object DocSettings {
 		opt.addOption("d", true, "Specifies the destination directory where javadoc saves the generated HTML files.")
 		opt.addOption("classpath", true, "Specifies the paths where javadoc will look for referenced classes (.class files) ")
 		opt.addOption("doctitle", true, "Specifies the title to be placed near the top of the overview summary file.")
+      val linkOption = new CliOption("link", true, "Creates links to existing javadoc-generated documentation of external referenced classes. As an argument it takes link or links to external javadoc documentations.")
+      linkOption.setArgs(CliOption.UNLIMITED_VALUES)
+      opt.addOption(linkOption)
 		opt
 	}
 
@@ -101,8 +108,6 @@ class DocSettings {
 	 * Processes command line arguments and finds options values.
 	 */
 	private def processOptions(options : Options, args : Array[String]) = {
-
-
 		/** Retrieve path to scala library using system environmental settings. */
 		def scalaClasspath() : List[String] = {
 			val scalaLib = System.getenv("SCALA_HOME") + "\\lib"
@@ -117,6 +122,25 @@ class DocSettings {
 			val classpath = scalaClasspath ::: List(_classpath)
 			classpath.mkString(File.pathSeparator)
 		}
+
+      /**
+       * Validates links and return list of well-formed links.
+       */
+      def processLinks(links : Array[String]) : List[String] = {
+         val linksBuffer = new ListBuffer[String]
+         for (link <- links) {
+            var lnk = link.trim
+            if (lnk.last != '/')
+               lnk = lnk + '/'
+            try {
+               Source.fromURL(new URL(lnk + settings.PACKAGE_LIST_FILE))
+               linksBuffer += lnk
+            } catch {
+               case ex : Exception => throw new IllegalArgumentException(ex.getCause)
+            }
+         }
+         linksBuffer.toList
+      }
 
 		val cl : CommandLine = new BasicParser().parse(options, args)
 		if (cl.hasOption("sourcepath")) {
@@ -135,6 +159,10 @@ class DocSettings {
 		} else {
 			javadocTitle = "API"
 		}
+      if (cl.hasOption("link")) {
+         val xxx = cl.getOptionValues("link")
+         links = processLinks(cl.getOptionValues("link"))
+      }
 	}
 
 }

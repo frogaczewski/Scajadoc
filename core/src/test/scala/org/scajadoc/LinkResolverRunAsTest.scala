@@ -1,6 +1,5 @@
 package org.scajadoc
 
-import frontend.linkResolver
 import org.specs.Specification
 import org.specs.mock.Mockito
 import tools.nsc.doc.model.DocTemplateEntity

@@ -1,9 +1,9 @@
-package org.scajadoc.frontend.page
+package org.scajadoc.page
 
 import xml.Node
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
 import collection.mutable.HashMap
-import org.scajadoc.frontend._
+import org.scajadoc._
 
 /**
  * Generate deprecated-list.html file.

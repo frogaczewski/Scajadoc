@@ -6,9 +6,9 @@ package org.scajadoc.distributed
 @Tests("tests of hs algorithm")
 @serializable
 @remote
-class HSAlgorithm extends Algorithm {
+class HSAlgorithm extends Algorithm[Runnable] {
 
-	def execute = {
+	def execute(a : Runnable) = {
 		
 	}
 

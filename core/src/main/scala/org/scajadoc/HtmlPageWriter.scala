@@ -1,4 +1,4 @@
-package org.scajadoc.frontend
+package org.scajadoc
 
 import page.HtmlPage
 import java.nio.channels.Channels

@@ -1,7 +1,7 @@
-package org.scajadoc.frontend.page
+package org.scajadoc.page
 
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
-import org.scajadoc.frontend.{entityPresentationUtil, classpathCache, entityTreeTraverser}
+import org.scajadoc.{entityPresentationUtil, classpathCache, entityTreeTraverser}
 import xml.{NodeBuffer, Node}
 
 /**
