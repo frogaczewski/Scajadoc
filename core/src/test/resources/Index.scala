@@ -10,3 +10,6 @@ class SimpleEnumeration extends Enumeration
 class PublicClass
 protected class ProtectedClass
 private class PrivateClass
+trait AnotherSimpleInterface
+trait AdvInterface extends SimpleInterface with AnotherSimpleInterface
+class Impl extends SimpleInterface

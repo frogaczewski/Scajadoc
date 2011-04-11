@@ -80,7 +80,7 @@
 		<sourceDirectory>src/main/scala</sourceDirectory>
 		<testSourceDirectory>src/test/scala</testSourceDirectory>
 		<plugins>
-			<plugin>
+			<!--<plugin>
 				<groupId>org.scajadoc</groupId>
 				<artifactId>scajadoc-maven-plugin</artifactId>
 				<version>0.1-SNAPSHOT</version>
@@ -88,7 +88,7 @@
 					<destination>C:\Users\Filip\Desktop\PracaDyplomowa\Testing\te</destination>
 					<scalaVersion>2.8.1</scalaVersion>
 				</configuration>
-			</plugin>
+			</plugin>-->
 
 			<plugin>
 				<groupId>org.scala-tools</groupId>

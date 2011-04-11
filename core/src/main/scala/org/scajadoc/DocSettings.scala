@@ -9,14 +9,34 @@ import io.Source
 import java.net.URL
 import collection.mutable.ListBuffer
 
+/**
+ * Object with settings for compiler, model factory and front end builder.
+ */
 object settings extends Settings(msg => error(msg)) {
 
-   final val OUTPUT_FORMAT = ".html"
+   /**
+    * Output format of files generates by front-end.
+    */
+   final val outputFormat = ".html"
 
-   final val PACKAGE_LIST_FILE = "package-list"
+   /**
+    * Name of file containing complete list of packages included in Javadoc.
+    */
+   final val packageListFile = "package-list"
 
+   /**
+    * Scajadoc output directory.
+    */
+   final val apiOutdir = File.separator + "scajadoc"
+
+   /**
+    * Links to external APIs.
+    */
    var links : List[String] = Nil:List[String]
 
+   /**
+    * Title of this javadoc.
+    */
 	var javadocTitle : String = _
 
 	def setSourcepath(sourcepath : List[String]) =
@@ -24,8 +44,17 @@ object settings extends Settings(msg => error(msg)) {
 
 	def setClasspath(classpath : String) = this.classpath.value = classpath
 
-	def setOutdir(outdir : Option[String]) = this.outdir.value = outdir.getOrElse(
-			throw new Exception("Wrong destination directory"))
+	def setOutdir(outdir : Option[String]) = {
+      outdir match {
+         case Some(v) => {
+            val outDirectory = new File(v + apiOutdir)
+            if (!outDirectory.exists)
+               outDirectory.mkdir
+            this.outdir.value = outDirectory.getAbsolutePath
+         }
+         case None => throw new IllegalArgumentException("Wrong destination directory")
+      }
+   }
 
 	def setJavadocTitle(title : String) = this.javadocTitle = title
 
@@ -133,10 +162,11 @@ class DocSettings {
             if (lnk.last != '/')
                lnk = lnk + '/'
             try {
-               Source.fromURL(new URL(lnk + settings.PACKAGE_LIST_FILE))
+               Source.fromURL(new URL(lnk + settings.packageListFile))
                linksBuffer += lnk
             } catch {
-               case ex : Exception => throw new IllegalArgumentException(ex.getCause)
+               case ex : Exception =>
+                  throw new IllegalArgumentException("Error while processing list of links to external APIs. Check you network connection and try again.")
             }
          }
          linksBuffer.toList
@@ -160,7 +190,6 @@ class DocSettings {
 			javadocTitle = "API"
 		}
       if (cl.hasOption("link")) {
-         val xxx = cl.getOptionValues("link")
          links = processLinks(cl.getOptionValues("link"))
       }
 	}

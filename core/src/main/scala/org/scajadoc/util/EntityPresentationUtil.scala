@@ -1,4 +1,4 @@
-package org.scajadoc
+package org.scajadoc.util
 
 import xml.NodeSeq
 import tools.nsc.doc.model.comment._
@@ -68,6 +68,7 @@ object entityPresentationUtil {
 	 * Returns parameters of the entity.
 	 * TODO generic handling
 	 */
+   @deprecated
 	def params(executable : NonTemplateMemberEntity) = {
 		executable match {
 			case d : Def => methodParams(d.valueParams)
@@ -81,6 +82,7 @@ object entityPresentationUtil {
 	 *
 	 * TODO add generic handling
 	 */
+   @deprecated
 	def methodParams(valueParams : List[List[ValueParam]]) = {
 		var paramsTypes = Nil:List[String]
 		valueParams.foreach(params => params.foreach(
@@ -97,6 +99,7 @@ object entityPresentationUtil {
 	 * TODO add annotation handling
 	 * TODO enum handling
 	 */
+   @deprecated
 	def templateType(template : DocTemplateEntity) = {
 		if (template.isPackage)
 			"Package"
@@ -109,6 +112,7 @@ object entityPresentationUtil {
 	/**
 	 * Returns type of the method. Static or instance.
 	 */
+   @deprecated
 	def methodType(definition : Def) = {
 		if (definition.inTemplate.isObject)
 			"Static method"
@@ -119,6 +123,7 @@ object entityPresentationUtil {
 	/**
 	 * Returns type of the variable. Static or instance.
 	 */
+   @deprecated
 	def variableType(variable : Val) = {
 		if (variable.inTemplate.isObject)
 			"Static variable"
@@ -126,14 +131,17 @@ object entityPresentationUtil {
 			"Variable"
 	}
 
+   @deprecated
 	def inType(entity : MemberEntity) = templateType(entity.inTemplate).toLowerCase
 
+   @deprecated
 	def inPackage(typ : DocTemplateEntity) = classpathCache(typ).packageCanonicalPath
 
 	/**
 	 * Returns name of the entity. In case of methods and constructors appends parameters
 	 * to the name.
 	 */
+   @deprecated
 	def entityName(entity : MemberEntity) = {
 		if (entity.isConstructor || entity.isDef)
 			entity.name + params(entity.asInstanceOf[NonTemplateMemberEntity])

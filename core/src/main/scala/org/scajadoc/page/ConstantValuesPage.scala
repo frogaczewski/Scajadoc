@@ -2,7 +2,8 @@ package org.scajadoc.page
 
 import xml.Node
 import tools.nsc.doc.model.{ConstantVal, MemberEntity, Package => ScalaPackage}
-import org.scajadoc.entityTreeTraverser
+import org.scajadoc.util.entityTreeTraverser
+
 
 /**
  * Generates constant-values.html file. 

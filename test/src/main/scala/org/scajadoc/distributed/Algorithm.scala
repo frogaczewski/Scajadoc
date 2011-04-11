@@ -6,3 +6,5 @@ package org.scajadoc.distributed
 trait Algorithm[A] {
 	def execute(a : A)
 }
+
+trait DisAlgorithm extends Algorithm[_]

@@ -1,7 +1,5 @@
 package org.scajadoc.util
 
-import tools.nsc.doc.Universe
-import org.scajadoc.entityTreeTraverser
 import tools.nsc.doc.model.{MemberEntity, DocTemplateEntity, Entity}
 import java.io.File
 import tools.nsc.io.Directory

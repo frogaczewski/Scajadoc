@@ -1,8 +1,9 @@
-package org.scajadoc
+package org.scajadoc.util
 
 import tools.nsc.doc.model._
 import collection.mutable.HashMap
 import java.io.File._
+import org.scajadoc.extractor.entityQueryContainer
 
 /**
  * Cache containing classpath entries associated with entities representing
@@ -18,7 +19,7 @@ object classpathCache {
 		new Classpath(null,null) {
 			override def canonicalClasspath = ""
 			override def packageCanonicalPath = ""
-			override def docPackageClasspath = "api" + separator
+			override def docPackageClasspath = ""
 			override def docFileClasspath = docPackageClasspath + filename
 		}
 	}
@@ -66,13 +67,13 @@ class Classpath (private val path : List[Entity], private val clpEntity : Entity
 	/**
 	 * Returns path to the documentation of this template's package.
 	 */
-	def docPackageClasspath() : String = "api" + separator +
+	def docPackageClasspath() : String = separator +
 			path.filter(isPackage).map(_.name).mkString(separator)
 
 	/**
 	 * Returns path to the documentation of this template.
 	 */
-	def docFileClasspath() : String = "api" + separator + path.filter(entity =>
+	def docFileClasspath() : String = separator + path.filter(entity =>
 		entity.isInstanceOf[DocTemplateEntity]
 		&& !entity.asInstanceOf[DocTemplateEntity].isRootPackage).map(_.name).mkString(separator)
 

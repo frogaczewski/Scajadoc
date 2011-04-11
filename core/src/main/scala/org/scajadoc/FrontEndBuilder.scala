@@ -1,10 +1,14 @@
 package org.scajadoc
 
+import extractor.entityQueryContainer
 import page._
 import tools.nsc.doc.Universe
 import tools.nsc.doc.model.DocTemplateEntity
+import util.{resourceManager, entityTreeTraverser}
 
 /**
+ * Entry point for generating html front-end from universe created
+ * by the model factory.
  *
  * @author Filip Rogaczewski
  */
@@ -24,19 +28,12 @@ class FrontEndBuilder(val universe : Universe) {
 
 
 	def build() = {
-		/* entityTreeTraverser.traverse(universe.rootPackage, doc => {
-			println("canonical classpath " + classpathCache(doc).canonicalClasspath)
-			println("package canonical path " + classpathCache(doc).packageCanonicalPath)
-			println("package  doc canonical path " + classpathCache(doc).docPackageClasspath)
-			println("doc classpath " + classpathCache(doc).docFileClasspath)
-			htmlPageWriter.createFile(classpathCache(doc))
-		}) */
-//		documentableEntityMap.map(universe.rootPackage)
+      resourceManager.copyResources
 		indexPages.foreach(page => htmlPageWriter.write(page))
 		entityTreeTraverser.collect(universe.rootPackage, isType).foreach(entity =>
-			htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
+         if (!entityQueryContainer.isMemberAnnotation(entity))
+            htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
-//		entityTreeTraverser.collect(universe.rootPackage, isType)
 	}
 
 }

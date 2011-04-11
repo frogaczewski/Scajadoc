@@ -32,7 +32,7 @@ trait HtmlPage {
 
 	def filename : String
 
-   def file = filename + settings.OUTPUT_FORMAT
+   def file = filename + settings.outputFormat
 
 	def html =
 		<html>

@@ -5,25 +5,25 @@ import org.specs.runner.{JUnit4, JUnitSuiteRunner}
 import org.specs.Specification
 import org.specs.mock.Mockito
 import org.scajadoc.util.{TemplateGenerator}
-import org.scajadoc.util.extractor.{Signature, Extractor}
+import org.scajadoc.extractor._
 import tools.nsc.doc.model.MemberEntity
 
 /**
- * Unit test of generic extractor.
+ * Unit test of extracting visibility. 
  *
  * @author Filip Rogaczewski
  */
 @RunWith(classOf[JUnitSuiteRunner])
-class GenericExtractorRunAsTest  extends JUnit4(genericExtractorTest)
+class VisibilityExtractorRunAsTest  extends JUnit4(visibilityExtractorTest)
 
-object genericExtractorTest extends Specification("Specification of generic extractor") with Mockito {
+object visibilityExtractorTest extends Specification("Specification of visibility extractor") with Mockito {
 
    var generator : TemplateGenerator = _
 
    private val path = "src/test/resources"
 
-   private val extractor = new Extractor[MemberEntity, Signature] {
-      def extract(info : MemberEntity) : Signature = null
+   private val extractor = new Extractor[MemberEntity, Extract] {
+      def extract(info : MemberEntity) : Option[Extract] = None
    }
    
    "Extractor extract visibility " should {

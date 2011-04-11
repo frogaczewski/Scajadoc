@@ -6,7 +6,7 @@ import org.specs.Specification
 import org.specs.mock.Mockito
 import org.scajadoc.util.{TemplateGenerator}
 import tools.nsc.doc.model.DocTemplateEntity
-import org.scajadoc.util.extractor.TypeExtractor
+import org.scajadoc.extractor._
 
 /**
  * Unit test for TypeExtractor class.
@@ -28,39 +28,39 @@ object typeExtractorTest extends Specification("Specification of type extractor"
       doBefore(generator = new TemplateGenerator)
       "Extract class type information from simple scala class" in {
          val index = generator.generate(path, "Index")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract class type information from scala sealed class" in {
          val index = generator.generate(path, "SealedIndex")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract class type information from case class" in {
          val index = generator.generate(path, "CaseIndex")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract annotation type information from simple scala class" in {
          val annot = generator.generate(path, "Annot")(0)
-         extractor.extract(annot.asInstanceOf[DocTemplateEntity]).typ mustEq "annotation type"
+         extractor.extract(annot.asInstanceOf[DocTemplateEntity]) mustBe None
       }
       "Extract class type information from scala object" in {
          val index = generator.generate(path, "Obj")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract class type information from scala case object" in {
          val index = generator.generate(path, "CaseObj")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract class type information from scala abstract class" in {
          val index = generator.generate(path, "AbstractIndex")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).typ mustEq "class"
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.typ mustEq "class"
       }
       "Extract interface information from simple scala trait" in {
          val interface = generator.generate(path, "SimpleInterface")(0)
-         extractor.extract(interface.asInstanceOf[DocTemplateEntity]).typ mustEq "interface"
+         extractor.extract(interface.asInstanceOf[DocTemplateEntity]).get.typ mustEq "interface"
       }
       "Extract enum information from simple scala enumeration" in {
          val enumeration = generator.generate(path, "SimpleEnumeration")(0)
-         extractor.extract(enumeration.asInstanceOf[DocTemplateEntity]).typ mustEq "enum"
+         extractor.extract(enumeration.asInstanceOf[DocTemplateEntity]).get.typ mustEq "enum"
       }
       "Extract package information from scala package" in {
 
@@ -71,7 +71,27 @@ object typeExtractorTest extends Specification("Specification of type extractor"
       doBefore(generator = new TemplateGenerator)
       "Extract public abstract class information from simple scala class" in {
          val index = generator.generate(path, "AbstractIndex")(0)
-         extractor.extract(index.asInstanceOf[DocTemplateEntity]).text mustEqual "public abstract class AbstractIndex\nextends Object\nimplements ScalaObject"
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+               mustEqual "public abstract class AbstractIndex\nextends Object\nimplements ScalaObject")
+      }
+      "Extract public class information from simple scala class" in {
+         val index = generator.generate(path, "SealedIndex")(0)
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+            mustEqual "public class SealedIndex\nextends Object\nimplements ScalaObject")
+      }
+      "Return none in case of public scala annotation" in {
+         val index = generator.generate(path, "AdvAnnot")(0)
+         extractor.extract(index.asInstanceOf[DocTemplateEntity]) mustBe None
+      }
+      "Extract public interface information from simple scala trait" in {
+         val index = generator.generate(path, "SimpleInterface")(0)
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+            mustEqual "public interface SimpleInterface")
+      }
+      "Extract public interface from scala trait with inheritance" in {
+         val index = generator.generate(path, "AdvInterface")(0)
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+            mustEqual "public interface AdvInterface\nextends SimpleInterface, AnotherSimpleInterface")
       }
    }
 

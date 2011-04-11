@@ -1,4 +1,4 @@
-package org.scajadoc
+package org.scajadoc.util
 
 import tools.nsc.doc.model.{MemberEntity, DocTemplateEntity}
 

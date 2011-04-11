@@ -13,3 +13,5 @@ class HSAlgorithm extends Algorithm[Runnable] {
 	}
 
 }
+
+class ExtHSAlgorithm extends HSAlgorithm

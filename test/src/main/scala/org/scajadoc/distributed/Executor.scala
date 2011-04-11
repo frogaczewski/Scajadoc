@@ -6,9 +6,9 @@ package org.scajadoc.distributed
 object Executor {
 
 	@throws(classOf[NoAlgorithmException])
-	def execute(algorithm : Option[Algorithm[_]]) = {
+	def execute(algorithm : Option[Algorithm[Object]]) = {
 		algorithm match {
-			case Some(a) => a.execute
+			case Some(a) => a.execute(null)
 			case None => throw new NoAlgorithmException("Algorithm is not supported.")
 		}
 	}

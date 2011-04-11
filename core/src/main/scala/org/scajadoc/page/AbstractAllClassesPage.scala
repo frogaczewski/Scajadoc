@@ -1,8 +1,8 @@
 package org.scajadoc.page
 
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
-import org.scajadoc.{entityPresentationUtil, classpathCache, entityTreeTraverser}
 import xml.{NodeBuffer, Node}
+import org.scajadoc.util.{entityPresentationUtil, classpathCache, entityTreeTraverser}
 
 /**
  * Abstract base for generating allclasses-noframe.html and allclasses-frame.html files.

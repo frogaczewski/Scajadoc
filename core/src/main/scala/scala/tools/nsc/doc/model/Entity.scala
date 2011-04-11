@@ -166,6 +166,17 @@ trait ValueParam extends ParameterEntity {
   def resultType: TypeEntity
   def defaultValue: Option[TreeEntity]
   def isImplicit: Boolean
+   def isFunction : Boolean
+   def isTuple : Boolean
+   def isProduct : Boolean
+}
+
+trait FunctionParam extends ValueParam {
+   def funType : TemplateEntity
+}
+
+trait TupleParam extends ValueParam {
+   def tupleType : TemplateEntity
 }
 
 /** An type that represents visibility of members. */

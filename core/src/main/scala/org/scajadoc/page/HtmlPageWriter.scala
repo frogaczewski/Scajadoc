@@ -1,9 +1,9 @@
-package org.scajadoc
+package org.scajadoc.page
 
-import page.HtmlPage
 import java.nio.channels.Channels
 import java.io.{File => JFile, FileOutputStream}
 import org.scajadoc.settings
+import org.scajadoc.util.classpathCache
 
 /**
  * Object which persists all page classes on disk. 

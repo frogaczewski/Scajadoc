@@ -469,31 +469,71 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
 
   /** */
   def makeValueParam(aSym: Symbol, inTpl: => DocTemplateImpl): ValueParam = {
-    makeValueParam(aSym, inTpl, aSym.nameString)
+     aSym.tpe match {
+        case tp : TypeRef if (checkFunctionType(tp)) =>
+              makeFunctionParam(aSym, inTpl)
+        case tp : TypeRef if (checkTupleType(tp)) =>
+               makeTupleParam(aSym, inTpl)
+        case _ => makeValueParam(aSym, inTpl, aSym.nameString)
+     }
   }
 
-  /** */
-  def makeValueParam(aSym: Symbol, inTpl: => DocTemplateImpl, newName: String): ValueParam =
-    new ParameterImpl(aSym, inTpl) with ValueParam {
-      override val name = newName
-      def isTypeParam = false
-      def isValueParam = true
-      def defaultValue =
-        if (aSym.hasDefault)
+   def makeTupleParam(aSym: Symbol, inTpl: => DocTemplateImpl) : TupleParam = {
+      new ParameterImpl(aSym, inTpl) with TupleParam {
+         def isImplicit = sym.isImplicit
+         def isTypeParam = false
+         def isValueParam = false
+         def defaultValue = getDefaultValue(aSym)
+         def resultType = makeType(sym.tpe, inTpl, sym)
+         def isProduct = false
+         def isTuple = true
+         def isFunction = false
+         def tupleType = makeTemplate(aSym.tpe.typeSymbol)
+      }
+   }
+
+   def makeFunctionParam(aSym: Symbol, inTpl: => DocTemplateImpl) : FunctionParam = {
+      new ParameterImpl(aSym, inTpl) with FunctionParam {
+         def isImplicit = sym.isImplicit
+         def isTypeParam = false
+         def isValueParam = false
+         def defaultValue = getDefaultValue(aSym)
+         def resultType = makeType(sym.tpe, inTpl, sym)
+         def isProduct = false
+         def isTuple = false
+         def isFunction = true
+         def funType = makeTemplate(aSym.tpe.typeSymbol)
+      }
+   }
+
+   private def getDefaultValue(aSym: Symbol) = {
+      if (aSym.hasDefault)
           // units.filter should return only one element
           (currentRun.units filter (_.source.file == aSym.sourceFile)).toList match {
             case List(unit) =>
               (unit.body find (_.symbol == aSym)) match {
-                case Some(ValDef(_,_,_,rhs)) => 
+                case Some(ValDef(_,_,_,rhs)) =>
                   Some(makeTree(rhs))
                 case _ => None
               }
             case _ => None
           }
         else None
-      def resultType =
-        makeType(sym.tpe, inTpl, sym)
-      def isImplicit = aSym.isImplicit
+   }
+
+  /** */
+  def makeValueParam(aSym: Symbol, inTpl: => DocTemplateImpl, newName: String): ValueParam =
+
+    new ParameterImpl(aSym, inTpl) with ValueParam {
+      override val name = newName
+      def isTypeParam = false
+      def isValueParam = true
+      def defaultValue = getDefaultValue(aSym)
+      def resultType = makeType(sym.tpe, inTpl, sym)
+      def isProduct = false
+      def isTuple = false
+      def isFunction = false
+       def isImplicit = sym.isImplicit
     }
 
   /** */
@@ -509,7 +549,19 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       }
     makeType(tpe, inTpl)
   }
-  
+
+   private def checkFunctionType(tpe: TypeRef): Boolean = {
+      val TypeRef(_, sym, args) = tpe
+      (args.length > 0) && (args.length - 1 <= definitions.MaxFunctionArity) &&
+      (sym == definitions.FunctionClass(args.length - 1))
+   }
+
+   private def checkTupleType(tpe : TypeRef) : Boolean = {
+      val TypeRef(_, sym, args) = tpe
+      (args.length > 1) && (args.length <= definitions.MaxTupleArity) &&
+      (sym == definitions.TupleClass(args.length))
+   }
+
   /** */
   def makeType(aType: Type, inTpl: => TemplateImpl): TypeEntity =
     new TypeEntity {
@@ -523,11 +575,6 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
           appendType0(tp)
           nameBuffer append sep
           appendTypes0(tps, sep)
-      }
-      private def checkFunctionType(tpe: TypeRef): Boolean = {
-        val TypeRef(_, sym, args) = tpe
-        (args.length > 0) && (args.length - 1 <= definitions.MaxFunctionArity) &&
-        (sym == definitions.FunctionClass(args.length - 1))
       }
       private def appendType0(tpe: Type): Unit = tpe match {
         /* Type refs */

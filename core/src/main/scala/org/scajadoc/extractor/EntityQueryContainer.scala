@@ -1,4 +1,4 @@
-package org.scajadoc
+package org.scajadoc.extractor
 
 import tools.nsc.doc.model.{Entity, MemberEntity, DocTemplateEntity}
 
@@ -58,6 +58,9 @@ object entityQueryContainer {
 	 */
 	val isAnnotation : (DocTemplateEntity => Boolean) =
 		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Annotation])
+
+   val isMemberAnnotation : (MemberEntity => Boolean) =
+      (t : MemberEntity) => t.isInstanceOf[DocTemplateEntity] && isAnnotation(t.asInstanceOf[DocTemplateEntity])
 
 	val isEnumeration : (DocTemplateEntity => Boolean) =
 		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Enumeration])
