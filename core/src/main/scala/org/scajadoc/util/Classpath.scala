@@ -11,6 +11,7 @@ import org.scajadoc.extractor.entityQueryContainer
  *
  * @author Filip Rogaczewski
  */
+@deprecated
 object classpathCache {
 
 	private val cache = new HashMap[Entity, Classpath]
@@ -39,6 +40,7 @@ object classpathCache {
 /**
  * Encapsulation of classpath. 
  */
+@deprecated
 class Classpath (private val path : List[Entity], private val clpEntity : Entity) {
 
 	import entityQueryContainer._

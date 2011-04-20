@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.{TemplateEntity, DocTemplateEntity}
+import tools.nsc.doc.model.{TypeEntity, TemplateEntity, DocTemplateEntity}
 
 /**
  * Class for extracting data of interfaces, classes, annotations, enums
@@ -8,7 +8,7 @@ import tools.nsc.doc.model.{TemplateEntity, DocTemplateEntity}
  *
  * @author Filip Rogaczewski
  */
-class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract]{
+class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
 
    def extract(info : DocTemplateEntity) : Option[TypeExtract] = {
       if (entityQueryContainer.isAnnotation(info))
@@ -18,30 +18,8 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract]{
    }
 
    class TypeExtractImpl(info : DocTemplateEntity) extends TypeExtract {
-      def name = info.name
-      def text = {
-         val builder = new StringBuilder
-         builder ++= extractVisibility(info.visibility)
-         builder ++= " "
-         if (info.isAbstract && !info.isTrait)
-            builder ++= "abstract "
-         builder ++= typ
-         builder ++= " "
-         builder ++= name
-         if (!info.isTrait && directSuperclass != Nil) {
-            builder ++= "\nextends "
-            builder ++= directSuperclass.name
-         }
-         if (interfaces != Nil) {
-            if (info.isTrait)
-               builder ++= "\nextends "
-            else
-               builder ++= "\nimplements "
-               val names = for (i <- interfaces) yield i.name
-               builder ++= names.mkString(", ")
-         }
-         builder.toString
-      }
+
+      def name = info.rawName
 
       def typ = {
          if (info.isPackage)
@@ -92,6 +70,8 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract]{
       def isClass = !isInterface && !isEnum
       def isInterface = entityQueryContainer.isInterface(info)
       def isEnum = entityQueryContainer.isEnumeration(info)
+      def visibility = extractVisibility(info.visibility)
+      def isAbstract = info.isAbstract && !info.isTrait
    }
 
 }
@@ -103,6 +83,8 @@ trait TypeExtract extends Extract {
    def isInterface : Boolean
    def isClass : Boolean
    def typ : String
+
+   def isAbstract : Boolean
 
    /**
     * Returns list of super classes (without Any, which is not a Java keyword).
@@ -117,7 +99,20 @@ trait TypeExtract extends Extract {
    def interfaces : List[TemplateEntity]
    def enclosingClass : Option[TemplateEntity]
    def inPackage : TemplateEntity
+
+   /**
+    * Returns list of subclasses which extend this template.
+    */
    def subclasses : List[TemplateEntity]
+
+   /**
+    * Returns list of subinterfaces extending this template.
+    */
    def subinterfaces : List[TemplateEntity]
+
+   /**
+    * Return direct superclass of this template.
+    */
    def directSuperclass : TemplateEntity
+   def visibility : String
 }

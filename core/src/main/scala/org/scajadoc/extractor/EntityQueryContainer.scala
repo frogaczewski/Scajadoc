@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.{Entity, MemberEntity, DocTemplateEntity}
+import tools.nsc.doc.model.{Val, Entity, MemberEntity, DocTemplateEntity, TemplateEntity}
 
 /**
  * Container holding basic entity queries. 
@@ -27,9 +27,9 @@ object entityQueryContainer {
 	/**
 	 * Returns true if the entity a class.
 	 */
-	val isType : (MemberEntity => Boolean) =
-		(entity : MemberEntity) => (entity.isInstanceOf[DocTemplateEntity]
-				&& !entity.asInstanceOf[DocTemplateEntity].isPackage)
+	val isType : (Entity => Boolean) =
+		(entity : Entity) => (entity.isInstanceOf[TemplateEntity]
+				&& !entity.asInstanceOf[TemplateEntity].isPackage)
 
 	val isInterface : (DocTemplateEntity => Boolean) =
 		(entity : DocTemplateEntity) => entity.isTrait
@@ -62,8 +62,26 @@ object entityQueryContainer {
    val isMemberAnnotation : (MemberEntity => Boolean) =
       (t : MemberEntity) => t.isInstanceOf[DocTemplateEntity] && isAnnotation(t.asInstanceOf[DocTemplateEntity])
 
+   /**
+    * Returns true if the entity is an enum.
+    */
 	val isEnumeration : (DocTemplateEntity => Boolean) =
 		(t : DocTemplateEntity) => isSubclassOf(t, classOf[scala.Enumeration])
 
+   /**
+    * Returns true if the entity is a field.
+    */
+   val isField : (MemberEntity => Boolean) =
+      (m : MemberEntity) => (m.isVal || m.isVar) && !isFunction(m)
+
+   /**
+    * Returns true if the entity is a function.
+    */
+   val isFunction : (MemberEntity => Boolean) = m => m.isFunction
+
+   val isMethod : (MemberEntity => Boolean) =
+      (m : MemberEntity) => m.isDef || isFunction(m) && !isConstructor(m)
+
+   val isConstructor : (MemberEntity => Boolean) = m => m.isConstructor
 
 }

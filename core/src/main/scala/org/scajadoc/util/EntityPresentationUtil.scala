@@ -1,9 +1,9 @@
 package org.scajadoc.util
 
-import xml.NodeSeq
 import tools.nsc.doc.model.comment._
 import tools.nsc.doc.model._
 import tools.nsc.doc.model.comment.{Link => ModelLink}
+import xml.{Node, NodeSeq}
 
 /**
  * Utility class with methods for presenting entity on html page. 
@@ -49,8 +49,38 @@ object entityPresentationUtil {
 	/**
 	 * Returns true if the definition should be documented.
 	 */
+   @deprecated
 	def isDocumentable(definition : Def) = definition.inDefinitionTemplates.contains(definition.inTemplate)
 
+   /**
+    * Returns list of the comments tags.
+    */
+   def tags(comment : Option[Comment]) : NodeSeq = {
+      def tag(name : String, el : List[Body]) = {
+         <dt><b>{name.capitalize}:</b></dt><dd>{el.map(bodyToHtml(_))}</dd>
+      }
+      comment match {
+         case Some(comment) => {
+            var tags = Nil:List[Node]
+            if (!comment.authors.isEmpty) {
+               tags ++= tag("author", comment.authors)
+            }
+            if (!comment.see.isEmpty) {
+               tags ++= tag("see", comment.see)
+            }
+            comment.since match {
+               case Some(since) => tags ++= tag("since", List(since))
+               case None => {}
+            }
+            comment.deprecated match {
+               case Some(dep) => tags ++= tag("deprecated", List(dep))
+               case None => {}
+            }
+            tags
+         }
+         case None => NodeSeq.Empty
+      }
+   }
 
 	/**
 	 * Returns short summary of comment.
@@ -62,6 +92,14 @@ object entityPresentationUtil {
 		case Some(comment) => entityPresentationUtil.inlineToHtml(comment.short).text
 		case None => ""
 	}
+
+   /**
+    * Returns full comment.
+    */
+   def full(comment : Option[Comment]) = comment match {
+      case Some(comment) => entityPresentationUtil.bodyToHtml(comment.body)
+      case None => ""
+   }
 
 
 	/**

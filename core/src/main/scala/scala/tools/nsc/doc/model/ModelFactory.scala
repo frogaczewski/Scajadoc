@@ -155,6 +155,16 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       ((!sym.isTrait && ((sym hasFlag Flags.ABSTRACT) || (sym hasFlag Flags.DEFERRED))) || 
       sym.isAbstractClass || sym.isAbstractType) && !sym.isSynthetic
     def isTemplate = false
+     def resultTemplate = {
+      def resultTpe(tpe: Type): Type = tpe match { // similar to finalResultType, except that it leaves singleton types alone
+        case PolyType(_, res) => resultTpe(res)
+        case MethodType(_, res) => resultTpe(res)
+        case _ => tpe
+      }
+        val normalize = normalizeTemplate(resultTpe(sym.tpe).typeSymbol)
+      makeTemplate(normalize)
+     }
+     def isFunction = false
   }
 
   /** Provides a default implementation for instances of the `TemplateEntity` type. It must be instantiated as a
@@ -406,7 +416,14 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
 				}
 			}
 		})
-	  } else*/ if (bSym.isGetter && bSym.isLazy)
+	  } else*/
+       /* handle functions */
+      if (bSym.isGetter && bSym.tpe.isInstanceOf[PolyType] && checkFunctionType(bSym.tpe.asInstanceOf[PolyType])) {
+         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
+            override def isFunction = true
+         })
+      }
+      else if (bSym.isGetter && bSym.isLazy)
         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
           override def isLazyVal = true
         })
@@ -423,11 +440,11 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
           override def isConstructor = true
           def isPrimary = sym.isPrimaryConstructor
         })
-      else if (bSym.isGetter) // Scala field accessor or Java field
+      else if (bSym.isGetter) { // Scala field accessor or Java field
         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
           override def isVal = true
         })
-      else if (bSym.isAbstractType)
+      } else if (bSym.isAbstractType)
         Some(new NonTemplateMemberImpl(bSym, inTpl) with TypeBoundsImpl with HigherKindedImpl with AbstractType {
           override def isAbstractType = true
         })
@@ -550,10 +567,18 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
     makeType(tpe, inTpl)
   }
 
-   private def checkFunctionType(tpe: TypeRef): Boolean = {
+   private def checkFunctionType(tpe: TypeRef) : Boolean = {
       val TypeRef(_, sym, args) = tpe
       (args.length > 0) && (args.length - 1 <= definitions.MaxFunctionArity) &&
       (sym == definitions.FunctionClass(args.length - 1))
+   }
+
+   private def checkFunctionType(tpe : PolyType) : Boolean = {
+      val PolyType(tparams, result) = tpe
+      if (result.isInstanceOf[TypeRef])
+         checkFunctionType(result.asInstanceOf[TypeRef])
+      else
+         false
    }
 
    private def checkTupleType(tpe : TypeRef) : Boolean = {

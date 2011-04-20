@@ -61,6 +61,8 @@ trait MemberEntity extends Entity {
   def isAliasType: Boolean
   def isAbstractType: Boolean
   def isTemplate: Boolean
+  def isFunction: Boolean
+   def resultTemplate : TemplateEntity
 }
 
 trait HigherKinded extends Entity {

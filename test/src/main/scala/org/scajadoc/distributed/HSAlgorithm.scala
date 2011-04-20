@@ -14,4 +14,6 @@ class HSAlgorithm extends Algorithm[Runnable] {
 
 }
 
-class ExtHSAlgorithm extends HSAlgorithm
+class ExtHSAlgorithm(val name : String) extends HSAlgorithm {
+   override def execute(a : Runnable) = {}
+}

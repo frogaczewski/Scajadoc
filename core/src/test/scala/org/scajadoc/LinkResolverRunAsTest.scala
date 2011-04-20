@@ -2,10 +2,11 @@ package org.scajadoc
 
 import org.specs.Specification
 import org.specs.mock.Mockito
-import tools.nsc.doc.model.DocTemplateEntity
 import org.junit.runner.RunWith
 import org.specs.runner.{JUnitSuiteRunner, JUnit4}
 import collection.mutable.{ListBuffer}
+import util.{TemplateGenerator, linkResolver}
+import tools.nsc.doc.model.{NonTemplateMemberEntity, DocTemplateEntity}
 
 /**
  * Unit tests for utility class resolving links within internal and external api.
@@ -16,6 +17,10 @@ import collection.mutable.{ListBuffer}
 class LinkResolverRunAsTest extends JUnit4(linkResolverTest)
 
 object linkResolverTest extends Specification("Specification of link resolver") with Mockito {
+
+   var generator : TemplateGenerator = _
+
+   private val path = "src/test/resources"
 
    "Link resolver" should {
       "Read list of packages from an online package-list file" in {
@@ -43,20 +48,45 @@ object linkResolverTest extends Specification("Specification of link resolver") 
          links += "http://download.oracle.com/javase/6/docs/api/"
          settings.links = links.toList
          val linkedTemplate = mock[DocTemplateEntity]
-         linkedTemplate.sourceUrl returns None
+         linkedTemplate.inSource returns None
          linkedTemplate.isPackage returns false
          linkedTemplate.isClass returns true
          linkedTemplate.name returns "String"
+         linkedTemplate.rawName returns "String"
          linkedTemplate.toRoot returns {
             val lang = mock[DocTemplateEntity]
             lang.name returns "lang"
+            lang.rawName returns "lang"
             lang.isPackage returns true
             val java = mock[DocTemplateEntity]
             java.name returns "java"
+            java.rawName returns "java"
             java.isPackage returns true
             List(linkedTemplate, lang, java)
          }
-         linkResolver.resolve(linkedTemplate).get.absoluteLink mustEqual "http://download.oracle.com/javase/6/docs/api/java/lang/String.html"
+         linkResolver.resolve(linkedTemplate).get.link(null) mustEqual "http://download.oracle.com/javase/6/docs/api/java/lang/String.html"
+      }
+   }
+
+   "Internal api resolution" in {
+      doBefore(generator = new TemplateGenerator)
+      "Resolve links to non templates entities" in {
+         val member = generator.generate(path, "simpleMember")(0)
+         linkResolver.resolve(member.asInstanceOf[NonTemplateMemberEntity]).get.link(member.inTemplate) mustEqual "../../org/scajadoc/Members.html#simpleMember"
+      }
+      "Resolve links to templates entities" in {
+         val member = generator.generate(path, "Members")(0)
+         linkResolver.resolve(member.asInstanceOf[DocTemplateEntity]).get.link(member.inTemplate) mustEqual "../../org/scajadoc/Members.html"
+      }
+      "Resolve links to templates entities from the higher node" in {
+         val member = generator.generate(path, "Members")(0)
+         val root = member.inTemplate.inTemplate
+         linkResolver.resolve(member.asInstanceOf[DocTemplateEntity]).get.link(root) mustEqual "../org/scajadoc/Members.html"
+      }
+      "Resolve links to templates entities from the project root" in {
+         val member = generator.generate(path, "Members")(0)
+         val root = member.inTemplate.inTemplate.inTemplate
+         linkResolver.resolve(member.asInstanceOf[DocTemplateEntity]).get.link(root) mustEqual "org/scajadoc/Members.html"
       }
    }
 

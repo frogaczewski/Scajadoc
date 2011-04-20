@@ -1,5 +1,6 @@
 package org.scajadoc.distributed;
 
+
 /**
  * // TODO: Document this
  *
@@ -8,4 +9,12 @@ package org.scajadoc.distributed;
  */
 //@Tests
 public class ApplyingAnnotation {
+
+   void test() {
+   }
+
+   public static void main(String... strings) {
+//      Executor.$bang$eq(new Object());
+   }
+
 }

@@ -33,6 +33,7 @@ class ParameterExtractor extends Extractor[HigherKinded, ParametersExtract] {
          }
       }
       Some(new ParametersExtract {
+         def name = ""
          def parameters = Nil
          def text = ""
       })

@@ -6,6 +6,12 @@ object Test extends Application {
    println("hello world!")
 }
 
+object Static {
+   val helloWorld = "Hello world"
+
+   val staticFun : (String => Boolean) = (_== "Hello world")
+}
+
 
 trait ITest {
    def method : String

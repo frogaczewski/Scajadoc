@@ -25,21 +25,11 @@ object typePageTest extends Specification("Specification of type page") with Moc
 
    private val extractor = new TypeExtractor
 
-   "TypePage should contain information about implemented interfaces" should {
+   /*"TypePage should contain information about implemented interfaces" should {
       doBefore {
          generator = new TemplateGenerator
          settings.sourcepath.value = path
       }
-      "Recognize no-implemented interfaces" in {
-         val index = generator.generate(path, "Index")(0)
-         new TypePage(index.asInstanceOf[DocTemplateEntity]).implementedInterfaces mustEqual
-         (<dl><dt><b>All Implemented Interfaces:</b><dd></dd></dt></dl>)
-      }
-      "Recognize implemented interfaces without links" in {
-         val index = generator.generate(path, "Impl")(0)
-         new TypePage(index.asInstanceOf[DocTemplateEntity]).implementedInterfaces mustEqual
-         (<dl><dt><b>All Implemented Interfaces:</b><dd><xml:group>SimpleInterface</xml:group></dd></dt></dl>)
-      }
-   }
+   }*/
    
 }
