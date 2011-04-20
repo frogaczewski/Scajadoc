@@ -24,6 +24,8 @@ object settings extends Settings(msg => error(msg)) {
     */
    final val packageListFile = "package-list"
 
+   final val packageFrameFile = "package-frame"
+
    /**
     * Scajadoc output directory.
     */

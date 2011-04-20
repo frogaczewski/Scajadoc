@@ -50,6 +50,7 @@ object linkResolver {
        * DocTemplateEntity may represent either internal source class or external dependency.
        */
       template match {
+         case p : Package => Some(InternalLink(p))
          case dt : DocTemplateEntity => resolve(dt)
          case nt : NoDocTemplate => externalLink(nt)
          case ntm : NonTemplateMemberEntity => makeNonTemplateLink(ntm)
@@ -125,6 +126,10 @@ abstract class Link(entity : Entity) {
    protected final def tmpLink(entity : Entity) = {
       var builder = new StringBuilder
       builder ++= entity.toRoot.reverse.filter(e => (isPackage(e) || isType(e))).map(_.rawName).mkString("/")
+      if (isPackage(entity)) {
+         builder ++= "/"
+         builder ++= settings.packageFrameFile
+      }
       builder ++= settings.outputFormat
       builder
    }

@@ -23,6 +23,7 @@ class FrontEndBuilder(val universe : Universe) {
 		pages ::= new AllClassesFramePage(universe.rootPackage)
 //		pages ::= new ConstantValuesPage(universe.rootPackage)
 		pages ::= new DeprecatedListPage(universe.rootPackage)
+      pages ::= new OverviewFramePage(universe.rootPackage)
 		pages
 	}
 
@@ -34,6 +35,7 @@ class FrontEndBuilder(val universe : Universe) {
          if (!entityQueryContainer.isMemberAnnotation(entity))
             htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
+//      entityTreeTraverser.collect(universe.rootPackage, isPackage).
 	}
 
 }
