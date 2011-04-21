@@ -25,6 +25,7 @@ class FrontEndBuilder(val universe : Universe) {
       pages += new DeprecatedListPage(universe.rootPackage)
       pages += new OverviewFramePage(universe.rootPackage)
       pages += new OverviewSummaryPage(universe.rootPackage)
+      pages += new ConstantValuesPage(universe.rootPackage)
 		pages.toList
 	}
 
@@ -33,13 +34,19 @@ class FrontEndBuilder(val universe : Universe) {
       resourceManager.copyResources
 		indexPages.foreach(page => htmlPageWriter.write(page))
 		entityTreeTraverser.collect(universe.rootPackage, isType).foreach(entity =>
-         if (!entityQueryContainer.isMemberAnnotation(entity))
-            htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
+         htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
       entityTreeTraverser.collect(universe.rootPackage, isPackage)
          .map(_.asInstanceOf[DocTemplateEntity])
-         .filter(isDocumentablePackage(_)).foreach(pack =>
-            htmlPageWriter.write(new PackagePage(pack)))
+         .filter(isDocumentablePackage(_)).foreach(makePackagePage(_))
 	}
+
+   /**
+    * Makes pages for package.
+    */
+   private def makePackagePage(pack : DocTemplateEntity) = {
+      htmlPageWriter.write(new PackagePage(pack))
+      htmlPageWriter.write(new PackageSummary(pack))
+   }
 
 }

@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.{Val, Entity, MemberEntity, DocTemplateEntity, TemplateEntity}
+import tools.nsc.doc.model.{Val, Entity, MemberEntity, DocTemplateEntity, TemplateEntity, ConstantVal}
 
 /**
  * Container holding basic entity queries. 
@@ -84,6 +84,10 @@ object entityQueryContainer {
       (m : MemberEntity) => m.isDef || isFunction(m) && !isConstructor(m)
 
    val isConstructor : (MemberEntity => Boolean) = m => m.isConstructor
+
+
+   def isConstant : MemberEntity => Boolean =
+      (m : MemberEntity) => m.isInstanceOf[ConstantVal]
 
    /**
     * Returns true if the package should be documented by Scajadoc.

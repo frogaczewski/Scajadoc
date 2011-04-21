@@ -398,6 +398,18 @@ object typePageHtmlUtil {
       <a name={extract.name}><!-- --></a>
       <h3>{extract.name}</h3>
       <pre>{signature(extract)}</pre>
+      <dl>
+         <dd>{entityPresentationUtil.full(extract.entity.comment)}</dd>
+         {entityPresentationUtil.tags(extract.entity.comment)}
+         {
+            val en = extract.entity
+            if (en.isInstanceOf[ConstantVal]) {
+               val const = en.asInstanceOf[ConstantVal]
+               val cvalue = const.value
+               val x = en.resultType
+            }
+         }
+      </dl>
    }
 
   /**

@@ -27,6 +27,8 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
 
       def name = info.rawName
 
+      def entity = info
+
       def typ = {
          if (info.isPackage)
             "package"
@@ -129,7 +131,9 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
 
 
 trait TypeExtract extends Extract {
-   def name : String
+
+   def entity : DocTemplateEntity
+
    def isEnum : Boolean
    def isInterface : Boolean
    def isClass : Boolean

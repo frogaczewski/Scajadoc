@@ -405,20 +405,21 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
   def makeMember(aSym: Symbol, inTpl: => DocTemplateImpl): List[MemberImpl] = {
 
     def makeMember0(bSym: Symbol): Option[MemberImpl] = {
-	  /* if (bSym.isConstant) {
-		Some(new NonTemplateMemberImpl(bSym, inTpl) with ConstantVal {
-			override def value = {
-				bSym.tpe match {
-					case ConstantType(e) => e.stringValue
-					case PolyType(x, ConstantType(e)) => e.stringValue
-					case MethodType(x, ConstantType(e)) => e.stringValue
-					case _ => ""
-				}
-			}
-		})
-	  } else*/
-       /* handle functions */
-      if (bSym.isGetter && bSym.tpe.isInstanceOf[PolyType] && checkFunctionType(bSym.tpe.asInstanceOf[PolyType])) {
+	   if (bSym.isGetter && bSym.isConstant) {
+         Some(new NonTemplateMemberImpl(bSym, inTpl) with ConstantVal {
+            override def value = {
+               bSym.tpe match {
+                  case ConstantType(e) => e.stringValue
+                  case PolyType(x, ConstantType(e)) => e.stringValue
+                  case MethodType(x, ConstantType(e)) => e.stringValue
+                  case _ => ""
+               }
+            }
+            override def isVal = true
+         })
+	   }
+       /* handles functions */
+      else if (bSym.isGetter && bSym.tpe.isInstanceOf[PolyType] && checkFunctionType(bSym.tpe.asInstanceOf[PolyType])) {
          Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
             override def isFunction = true
          })
