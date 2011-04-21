@@ -5,6 +5,7 @@ import page._
 import tools.nsc.doc.Universe
 import tools.nsc.doc.model.DocTemplateEntity
 import util.{resourceManager, entityTreeTraverser}
+import collection.mutable.ListBuffer
 
 /**
  * Entry point for generating html front-end from universe created
@@ -17,14 +18,14 @@ class FrontEndBuilder(val universe : Universe) {
 	import entityQueryContainer._
 
 	lazy val indexPages = {
-		var pages = Nil:List[HtmlPage]
-		pages ::= new SingleIndexPage(universe.rootPackage)
-		pages ::= new AllClassesNoFramePage(universe.rootPackage)
-		pages ::= new AllClassesFramePage(universe.rootPackage)
-//		pages ::= new ConstantValuesPage(universe.rootPackage)
-		pages ::= new DeprecatedListPage(universe.rootPackage)
-      pages ::= new OverviewFramePage(universe.rootPackage)
-		pages
+      var pages = new ListBuffer[HtmlPage]
+      pages += new SingleIndexPage(universe.rootPackage)
+      pages += new AllClassesNoFramePage(universe.rootPackage)
+      pages += new AllClassesFramePage(universe.rootPackage)
+      pages += new DeprecatedListPage(universe.rootPackage)
+      pages += new OverviewFramePage(universe.rootPackage)
+      pages += new OverviewSummaryPage(universe.rootPackage)
+		pages.toList
 	}
 
 

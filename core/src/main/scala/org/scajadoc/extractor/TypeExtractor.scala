@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.{TypeEntity, TemplateEntity, DocTemplateEntity}
+import tools.nsc.doc.model._
 
 /**
  * Class for extracting data of interfaces, classes, annotations, enums
@@ -9,6 +9,12 @@ import tools.nsc.doc.model.{TypeEntity, TemplateEntity, DocTemplateEntity}
  * @author Filip Rogaczewski
  */
 class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
+
+   import entityQueryContainer._
+
+   private val methodExtractor = new MethodExtractor
+
+   private val fieldExtractor = new FieldExtractor
 
    def extract(info : DocTemplateEntity) : Option[TypeExtract] = {
       if (entityQueryContainer.isAnnotation(info))
@@ -66,12 +72,57 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
       }
       def subclasses = info.subClasses.filter(!_.isTrait)
       def subinterfaces = info.subClasses.filter(_.isTrait)
-      def directSuperclass = superClasses.head
+      def directSuperclass = superClasses.last
       def isClass = !isInterface && !isEnum
       def isInterface = entityQueryContainer.isInterface(info)
-      def isEnum = entityQueryContainer.isEnumeration(info)
+      def isEnum = isEnumeration(info)
       def visibility = extractVisibility(info.visibility)
       def isAbstract = info.isAbstract && !info.isTrait
+
+      private val entityMethods = {
+         def entMethods(ent : DocTemplateEntity) = {
+            ent.members.filter(isMethod).map(e => {
+               e match {
+                  case d : Def => methodExtractor.extract(d)
+                  case v : Val => methodExtractor.extract(v)
+                  case _ => None
+               }
+            }).filter(_.isDefined).map(_.get)
+         }
+         info.companion match {
+            case Some(companion) => entMethods(info) ++ entMethods(companion)
+            case None => entMethods(info)
+         }
+      }
+
+      private val entityFields = {
+         def entFields(ent : DocTemplateEntity) = {
+            ent.members.filter(isField).map(e => {
+               e match {
+                  case v : Val => fieldExtractor.extract(v)
+                  case _ => None
+               }
+            }).filter(_.isDefined).map(_.get)
+         }
+         info.companion match {
+            case Some(companion) => entFields(info) ++ entFields(companion)
+            case None => entFields(info)
+         }
+      }
+
+      def constructors = {
+         info.members.filter(isConstructor).map(e => {
+            e match {
+               case c : Constructor => methodExtractor.extract(c)
+               case _ => None
+            }
+         }).filter(_.isDefined).map(_.get)
+      }
+
+      def inheritedFields = entityFields.filter(_.isInherited).map(_.asInstanceOf[InheritedMember])
+      def fields = entityFields.filter(!_.isInherited)
+      def inheritedMethods = entityMethods.filter(_.isInherited).map(_.asInstanceOf[InheritedMember])
+      def methods = entityMethods.filter(!_.isInherited)
    }
 
 }
@@ -99,6 +150,31 @@ trait TypeExtract extends Extract {
    def interfaces : List[TemplateEntity]
    def enclosingClass : Option[TemplateEntity]
    def inPackage : TemplateEntity
+
+   /**
+    * Returns list of documentable methods of the entity and its companion.
+    */
+   def methods : List[MethodExtract]
+
+   /**
+    * Returns list of documentable inherited methods of the entity and its companion.
+    */
+   def inheritedMethods : List[InheritedMember]
+
+   /**
+    * Returns list of documentable fields of the entity and its companion.
+    */
+   def fields : List[FieldExtract]
+
+   /**
+    * Returns list of documentable inherited fields of the entity and its companion.
+    */
+   def inheritedFields : List[InheritedMember]
+
+   /**
+    * Returns list of documentable constructors.
+    */
+   def constructors : List[MethodExtract]
 
    /**
     * Returns list of subclasses which extend this template.

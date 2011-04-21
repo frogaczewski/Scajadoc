@@ -39,6 +39,7 @@ trait HtmlPage {
 			<head>
 				<title>{ title }</title>
 				<meta http-equiv="content-type" content={ "text/html; charset=" + encoding }/>
+            <link rel="stylesheet" type="text/css" href="stylesheet.css" title="Style" />
 				{ headers }
 			</head>
          <body>

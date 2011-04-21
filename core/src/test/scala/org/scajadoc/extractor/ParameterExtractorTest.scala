@@ -32,15 +32,15 @@ object parameterExtractorTest extends Specification("Specification of generics e
       doBefore(generator = new TemplateGenerator)
       "Extract simple generic method with generic and non-generic arguments" in {
          val generic = generator.generate(path, "mixedGenericMethod")(0)
-         extractor.extract(generic).get.text mustEq "<B>"
+         extractor.extract(generic).get.name mustEq "<B>"
       }
       "Extract simple function from method parameters" in {
          val generic = generator.generate(path, "methodWithSimpleFunction")(0)
-         extractor.extract(generic).get.text mustEq ""
+         extractor.extract(generic).get.name mustEq ""
       }
       "Extract simple tupple from method parameters" in {
          val generic = generator.generate(path, "methodWithTuple")(0)
-         extractor.extract(generic).get.text mustEq ""
+         extractor.extract(generic).get.name mustEq ""
       }
       /*"Extract simple generic information from scala class signature" in {
          val generic = generator.generate(path, "SimpleGeneric")(0)

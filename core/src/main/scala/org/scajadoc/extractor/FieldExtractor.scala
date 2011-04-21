@@ -12,7 +12,10 @@ class FieldExtractor extends Extractor[Val, FieldExtract] {
    object typeExtractor extends TypeExtractor
 
    def extract(info : Val) : Option[FieldExtract] = {
-      Some(new FieldExtractImpl(info))
+      if (info.inDefinitionTemplates.contains(info.inTemplate))
+         Some(new FieldExtractImpl(info))
+      else
+         Some(new InheritedFieldImpl(info))
    }
 
    class FieldExtractImpl(info : Val) extends FieldExtract {
@@ -31,6 +34,13 @@ class FieldExtractor extends Extractor[Val, FieldExtract] {
       }
 
       def entity = info
+
+      def isInherited = false
+   }
+
+   class InheritedFieldImpl(info : Val) extends FieldExtractImpl(info) with InheritedMember {
+      def inDefinitionTemplates = info.inDefinitionTemplates
+      override def isInherited = true
    }
 
 }

@@ -2,8 +2,10 @@ package org.scajadoc.util
 
 import org.scajadoc.settings
 import java.io.{FileOutputStream, File}
-import java.nio.channels.Channels
 import tools.nsc.io.Streamable
+import java.text.SimpleDateFormat
+import java.util.Date
+import io.Source
 
 /**
  * Object handling the operations on Scajadoc resources, such as images,
@@ -21,7 +23,17 @@ object resourceManager {
    }
 
    def copyResources() = {
-      def copyFile(filename : String)(implicit outputDirectory : File) {
+      def writeIndex(filename : String, outdir : File) = {
+         val input = Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
+         val output = input
+               .replace("$scajadoc-generation-time", new SimpleDateFormat("dd.MM.yyyy").format(new Date()))
+               .replace("$scajadoc-title", settings.javadocTitle)
+         val bytes = output.getBytes("UTF-8")
+         val fos = new FileOutputStream(new File(outdir, filename))
+         fos.write(bytes, 0, bytes.length)
+         fos.close
+      }
+      def copyFile(filename : String)(implicit outputDirectory : File) = {
          val outputFile = new File(outputDirectory, filename)
          val input = new Streamable.Bytes {
             val inputStream = getClass.getResourceAsStream(filename)
@@ -31,8 +43,10 @@ object resourceManager {
          fos.write(input, 0, input.length)
          fos.close
       }
+      val outdir = new File(settings.outdir.value)
       copyFile("/inherit.gif")
-      copyFile("/index.html")(new File(settings.outdir.value))
+      copyFile("/stylesheet.css")(outdir)
+      writeIndex("/index.html", outdir)
    }
 
    /**

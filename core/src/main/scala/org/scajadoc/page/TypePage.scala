@@ -31,10 +31,6 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
     */
    private val extract = new TypeExtractor().extract(template).get
 
-   private val fieldExtractor = new FieldExtractor
-
-   private val methodExtractor = new MethodExtractor
-
 	def body = {
 		var body = Nil:List[Node]
 		body ++= header
@@ -44,23 +40,27 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
          body ++= subClasses
          body ++= nestedClass
          body ++= signature
-         body ++= comment
+         body ++= typePageHtmlUtil.comment(template)
          body ++= tags
-         body ++= fieldsSummary
-         body ++= constructorSummary
-         body ++= methodsSummary
-         body ++= inheritedMethods
+         body ++= fieldsSummary(extract.fields)
+         body ++= inheritedFields(extract.inheritedFields)
+         body ++= constructorSummary(extract.constructors)
+         body ++= methodsSummary(extract.methods)
+         body ++= inheritedMethods(extract.inheritedMethods)
+         body ++= fieldsDetail(extract.fields)
+         body ++= constructorsDetail(extract.constructors)
+         body ++= methodsDetail(extract.methods)
       } else if (extract.isInterface) {
          body ++= superInterfaces
          body ++= subInterfaces
          body ++= implementingClasses
          body ++= signature
-         body ++= comment
+         body ++= typePageHtmlUtil.comment(template)
          body ++= tags
-         body ++= fieldsSummary
-         body ++= methodsSummary
-         body ++= fieldsDetail
-         body ++= methodsDetail
+         body ++= fieldsSummary(extract.fields)
+         body ++= methodsSummary(extract.methods)
+         body ++= fieldsDetail(extract.fields)
+         body ++= methodsDetail(extract.methods)
       }
 		body
 	}
@@ -182,13 +182,6 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
       </dl>
    }
 
-   /**
-    * Comment of this class.
-    */
-   private def comment() = {
-      <xml:node>{entityPresentationUtil.full(template.comment)}</xml:node> ++ <hr/>
-   }
-
    private def tags() = entityPresentationUtil.tags(template.comment)
 
    private def footer() = {
@@ -198,70 +191,54 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
    /**
     * Creates a list of field summaries.
     */
-   private def fieldsSummary() : NodeSeq = {
-      val fieldExtracts = template.members.filter(isField).map(e => {
-         e match {
-            case v : Val => fieldExtractor.extract(v)
-            case _ => None
-         }
-      }).filter(_.isDefined).map(_.get)
-      typePageHtmlUtil.summaryToHtml(fieldExtracts, "Field Summary", template)
+   private def fieldsSummary(fields : List[FieldExtract]) : NodeSeq = {
+      typePageHtmlUtil.summaryToHtml(fields, "Field Summary", template)
    }
 
    /**
     * Creates a list of methods summaries.
     */
-   private def methodsSummary() : NodeSeq = {
-      val methodExtracts = template.members.filter(isMethod).map(e => {
-         e match {
-            case d : Def => methodExtractor.extract(d)
-            case v : Val => methodExtractor.extract(v)
-            case _ => None
-         }
-      }).filter(_.isDefined).map(_.get).filter(!_.isInherited)
-      typePageHtmlUtil.summaryToHtml(methodExtracts, "Method Summary", template)
-   }
+   private def methodsSummary(methods : List[MethodExtract]) : NodeSeq =
+      typePageHtmlUtil.summaryToHtml(methods, "Method Summary", template)
 
    /**
     * Creates a list of constructor summaries.
     */
-   private def constructorSummary() : NodeSeq = {
-      val constructorExtracts = template.members.filter(isConstructor).map(e => {
-         e match {
-            case c : Constructor => methodExtractor.extract(c)
-            case _ => None
-         }
-      }).filter(_.isDefined).map(_.get)
-      typePageHtmlUtil.summaryToHtml(constructorExtracts, "Constructor Summary", template)
-   }
+   private def constructorSummary(constructors : List[MethodExtract]) : NodeSeq =
+      typePageHtmlUtil.summaryToHtml(constructors, "Constructor Summary", template)
+
+   private def inheritedMethods(extracts : List[InheritedMember]) : NodeSeq =
+      inheritedExtracts("Methods", extracts)
+
+   private def inheritedFields(extracts : List[InheritedMember]) : NodeSeq =
+      inheritedExtracts("Fields", extracts)
 
    /**
     * Creates a list of inherited methods.
     */
-   private def inheritedMethods() : NodeSeq = {
-      def methodsForSupertype(extracts : List[InheritedMethodExtract], from : TemplateEntity) =
+   private def inheritedExtracts(inheritedType : String, extracts : List[InheritedMember]) : NodeSeq = {
+      def inheritedForSupertype(extracts : List[InheritedMember], from : TemplateEntity) = {
          extracts.filter(extract => extract.inDefinitionTemplates.map(_.qualifiedName).contains(from.qualifiedName))
-      val methodExtracts = template.members.filter(isMethod).map(e => {
-         e match {
-            case d : Def => methodExtractor.extract(d)
-            case v : Val => methodExtractor.extract(v)
-            case _ => None
-         }
-      }).filter(_.isDefined).map(_.get).filter(_.isInherited).map(_.asInstanceOf[InheritedMethodExtract])
+      }
       val supertypes = extract.superClasses ++ extract.interfaces
-      var supertypesMethodsHtml = Nil:List[Node]
+      var inheritedHtml = Nil:List[Node]
       supertypes.foreach(superType => {
-         supertypesMethodsHtml ++= typePageHtmlUtil.listOfInheritedMethodsToHtml(
-            methodsForSupertype(methodExtracts, superType), superType, template)
+         inheritedHtml ++= typePageHtmlUtil.listOfInheritedToHtml(inheritedType,
+            inheritedForSupertype(extracts, superType), superType, template)
       })
-      supertypesMethodsHtml
+      inheritedHtml ++= <br/>
+      inheritedHtml
    }
 
-   private def fieldsDetail() : NodeSeq = {
-      NodeSeq.Empty
+   private def fieldsDetail(fields : List[FieldExtract]) : NodeSeq = {
+      typePageHtmlUtil.detailsToHtml(fields, "Field Detail", template)
    }
 
-   private def methodsDetail() : NodeSeq = {
+   private def methodsDetail(methods : List[MethodExtract]) : NodeSeq = {
+      typePageHtmlUtil.detailsToHtml(methods, "Method Detail", template)
+   }
+
+   private def constructorsDetail(constructors : List[MethodExtract]) : NodeSeq = {
       NodeSeq.Empty
    }
 
@@ -361,6 +338,9 @@ object typePageHtmlUtil {
       }
    }
 
+   /**
+    * Builds html list of types.
+    */
    def listOfTypesToHtml(types : List[TemplateEntity], title : String, from : DocTemplateEntity) = {
       if (types.isEmpty)
          NodeSeq.Empty
@@ -370,13 +350,16 @@ object typePageHtmlUtil {
       }
    }
 
-   def listOfInheritedMethodsToHtml(inhMethods : List[InheritedMethodExtract], from : TemplateEntity, tmp : DocTemplateEntity) = {
+   /**
+    * List of inherited methods to html.
+    */
+   def listOfInheritedToHtml(inheritedType : String, inhMethods : List[InheritedMember], from : TemplateEntity, tmp : DocTemplateEntity) = {
       if (inhMethods.isEmpty)
           NodeSeq.Empty
       else {
          <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
             <tr bgcolor="#EEEEFF" class="TableSubHeadingColor">
-               <th align="left"><b>Methods inherited from class {from.qualifiedName}</b></th>
+               <th align="left"><b>{inheritedType} inherited from class {from.qualifiedName}</b></th>
             </tr>
             <tr bgcolor="white" class="TableRowColor">
                <td>{extractsToHtmlLinks(inhMethods, tmp)}
@@ -384,6 +367,44 @@ object typePageHtmlUtil {
             </tr>
          </table>
       }
+   }
+
+
+   /**
+    * Builds detail information about the entites.
+    */
+   def detailsToHtml(extracts : List[MemberExtract], title : String, from : DocTemplateEntity) : NodeSeq = {
+      if (extracts.isEmpty)
+         NodeSeq.Empty
+      else {
+         var detailsHtml = Nil:List[Node]
+         detailsHtml ++= <a name={title.replace(" ", "_")}><!-- --></a>
+         detailsHtml ++= <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+            <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+               <th align="left" colspan="1">
+                  <font size="+2"><b>{title}</b></font>
+               </th>
+            </tr>
+         </table>
+         detailsHtml ++= <xml:group>{extracts.map(detailToHtml(_, from))}</xml:group>
+         detailsHtml
+      }
+   }
+
+   def detailToHtml(extract : MemberExtract, from : DocTemplateEntity) : NodeSeq = {
+      def signature(extract : MemberExtract) = {
+         "signature"
+      }
+      <a name={extract.name}><!-- --></a>
+      <h3>{extract.name}</h3>
+      <pre>{signature(extract)}</pre>
+   }
+
+  /**
+    * Comment of this class.
+    */
+   def comment(entity : MemberEntity) = {
+      <xml:node>{entityPresentationUtil.full(entity.comment)}</xml:node> ++ <hr/>
    }
 
 }

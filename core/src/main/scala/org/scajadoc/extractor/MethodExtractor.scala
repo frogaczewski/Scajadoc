@@ -1,8 +1,6 @@
 package org.scajadoc.extractor
 
 import tools.nsc.doc.model.{TemplateEntity, DocTemplateEntity, NonTemplateMemberEntity}
-import tools.nsc.symtab.SymbolTable
-import org.scajadoc.util.compiler
 
 /**
  * Class for extracting java information from both: defs and vals.
@@ -67,7 +65,7 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
       override def name = info.inTemplate.rawName
    }
 
-   class InheritedMethodExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) with InheritedMethodExtract {
+   class InheritedMethodExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) with InheritedMember {
       override def isInherited = true
       def inDefinitionTemplates = info.inDefinitionTemplates
    }
@@ -81,12 +79,6 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
  */
 trait MethodExtract extends MemberExtract {
 
-   def isInherited : Boolean
-
    def inTemplate : DocTemplateEntity
 
-}
-
-trait InheritedMethodExtract extends MethodExtract {
-   def inDefinitionTemplates  : List[TemplateEntity]
 }

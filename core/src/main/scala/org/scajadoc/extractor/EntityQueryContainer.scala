@@ -25,11 +25,12 @@ object entityQueryContainer {
 				&& !isRootPackage(entity))
 
 	/**
-	 * Returns true if the entity a class.
+	 * Returns true if the entity is a type.
 	 */
 	val isType : (Entity => Boolean) =
 		(entity : Entity) => (entity.isInstanceOf[TemplateEntity]
-				&& !entity.asInstanceOf[TemplateEntity].isPackage)
+				&& !entity.asInstanceOf[TemplateEntity].isPackage
+            && !(entity.isInstanceOf[DocTemplateEntity] && isAnnotation(entity.asInstanceOf[DocTemplateEntity])))
 
 	val isInterface : (DocTemplateEntity => Boolean) =
 		(entity : DocTemplateEntity) => entity.isTrait

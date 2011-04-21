@@ -3,6 +3,7 @@ package org.scajadoc.page
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
 import xml.{NodeBuffer, Node}
 import org.scajadoc.util.{entityPresentationUtil, classpathCache, entityTreeTraverser}
+import org.scajadoc.extractor.entityQueryContainer
 
 /**
  * Abstract base for generating allclasses-noframe.html and allclasses-frame.html files.
@@ -11,11 +12,7 @@ import org.scajadoc.util.{entityPresentationUtil, classpathCache, entityTreeTrav
  */
 abstract class AbstractAllClassesPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
-	/**
-	 * Collects all template entities except of packages.
-	 */
-	def allClassesCondition : (MemberEntity => Boolean) =
-		(t : MemberEntity) => t.isInstanceOf[DocTemplateEntity] && !t.asInstanceOf[DocTemplateEntity].isPackage
+   import entityQueryContainer._
 
 	def pageTitle = "All Classes"
 
@@ -27,7 +24,7 @@ abstract class AbstractAllClassesPage(val rootPackage : ScalaPackage) extends Ht
 		var body = Nil:List[Node]
 		body ++= <font size="+1" class="FrameHeadingFont"><b>All Classes</b></font>
 		body ++= <br/>
-		entityTreeTraverser.collect(rootPackage, allClassesCondition).sortBy(sort).foreach(e =>
+		entityTreeTraverser.collect(rootPackage, isType).sortBy(sort).foreach(e =>
 			body ++= new LinkedType {
 				override def name = e.rawName
 				override def link = classpathCache(e).docBaseFileClasspath + ".html"

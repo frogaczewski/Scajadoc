@@ -66,6 +66,20 @@ trait MemberExtract extends Extract {
     * Returns extracted entity.
     */
    def entity : NonTemplateMemberEntity
+
+   /**
+    * Returns true if the member is inherited from a class or an interface.
+    */
+   def isInherited : Boolean
+}
+
+/**
+ * Trait for fields or methods which are inherited.
+ *
+ * @author Filip Rogaczewski
+ */
+trait InheritedMember extends MemberExtract {
+   def inDefinitionTemplates  : List[TemplateEntity]
 }
 
 /**

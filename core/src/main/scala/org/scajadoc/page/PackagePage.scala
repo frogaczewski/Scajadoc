@@ -67,7 +67,7 @@ object packagePageHtmlUtil {
 
    def typeToHtml(typ : DocTemplateEntity, from : DocTemplateEntity) = {
       linkResolver.resolve(typ) match {
-         case Some(l) => <br/><a href={l.link(from)}>{typ.rawName}</a>
+         case Some(l) => <br/><a href={l.link(from)} target="classFrame">{typ.rawName}</a>
          case None => <br/><xml:node>{typ.rawName}</xml:node>
       }
    }

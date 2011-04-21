@@ -71,12 +71,12 @@ object typeExtractorTest extends Specification("Specification of type extractor"
       doBefore(generator = new TemplateGenerator)
       "Extract public abstract class information from simple scala class" in {
          val index = generator.generate(path, "AbstractIndex")(0)
-         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.name
                mustEqual "public abstract class AbstractIndex\nextends Object\nimplements ScalaObject")
       }
       "Extract public class information from simple scala class" in {
          val index = generator.generate(path, "SealedIndex")(0)
-         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.name
             mustEqual "public class SealedIndex\nextends Object\nimplements ScalaObject")
       }
       "Return none in case of public scala annotation" in {
@@ -85,12 +85,12 @@ object typeExtractorTest extends Specification("Specification of type extractor"
       }
       "Extract public interface information from simple scala trait" in {
          val index = generator.generate(path, "SimpleInterface")(0)
-         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.name
             mustEqual "public interface SimpleInterface")
       }
       "Extract public interface from scala trait with inheritance" in {
          val index = generator.generate(path, "AdvInterface")(0)
-         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.text
+         (extractor.extract(index.asInstanceOf[DocTemplateEntity]).get.name
             mustEqual "public interface AdvInterface\nextends SimpleInterface, AnotherSimpleInterface")
       }
    }
