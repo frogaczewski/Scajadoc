@@ -41,7 +41,9 @@ trait HtmlPage {
 				<meta http-equiv="content-type" content={ "text/html; charset=" + encoding }/>
 				{ headers }
 			</head>
-			{ body }
+         <body>
+            {body}
+         </body>
 		</html>
 
 }

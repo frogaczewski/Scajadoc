@@ -13,7 +13,7 @@ import tools.nsc.io.Streamable
  */
 object resourceManager {
 
-   private final val outputDirectory = {
+   private final implicit val outputDirectory = {
       val dir = new File(settings.outdir.value + File.separator + "resources")
       if (!dir.exists)
          dir.mkdir
@@ -21,7 +21,7 @@ object resourceManager {
    }
 
    def copyResources() = {
-      def copyFile(filename : String) {
+      def copyFile(filename : String)(implicit outputDirectory : File) {
          val outputFile = new File(outputDirectory, filename)
          val input = new Streamable.Bytes {
             val inputStream = getClass.getResourceAsStream(filename)
@@ -32,6 +32,7 @@ object resourceManager {
          fos.close
       }
       copyFile("/inherit.gif")
+      copyFile("/index.html")(new File(settings.outdir.value))
    }
 
    /**

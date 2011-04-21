@@ -84,4 +84,10 @@ object entityQueryContainer {
 
    val isConstructor : (MemberEntity => Boolean) = m => m.isConstructor
 
+   /**
+    * Returns true if the package should be documented by Scajadoc.
+    */
+   def isDocumentablePackage : DocTemplateEntity => Boolean =
+      (pack : DocTemplateEntity) => pack.members.filter(!isPackage(_)).size != 0
+
 }

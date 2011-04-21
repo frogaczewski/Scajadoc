@@ -35,7 +35,10 @@ class FrontEndBuilder(val universe : Universe) {
          if (!entityQueryContainer.isMemberAnnotation(entity))
             htmlPageWriter.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
-//      entityTreeTraverser.collect(universe.rootPackage, isPackage).
+      entityTreeTraverser.collect(universe.rootPackage, isPackage)
+         .map(_.asInstanceOf[DocTemplateEntity])
+         .filter(isDocumentablePackage(_)).foreach(pack =>
+            htmlPageWriter.write(new PackagePage(pack)))
 	}
 
 }

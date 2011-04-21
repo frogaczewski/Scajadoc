@@ -23,14 +23,11 @@ class OverviewFramePage(val template : DocTemplateEntity) extends HtmlPage {
    def headers = ""
 
    def body = {
-      def isDocumentable(pack : DocTemplateEntity) = {
-         pack.members.filter(!isPackage(_)).size != 0
-      }
       val packages = entityTreeTraverser.collect(template, isPackage).sortBy(m => m.qualifiedName).map(_.asInstanceOf[DocTemplateEntity])
       <table border="0" width="100%" summary="">
          <tr><td><font class="FrameItemFont"><a href="allclasses-frame.html" target="packageFrame">All Classes</a></font>
             <p><font size="+1" class="FrameHeadingFont">Packages</font><br/> {
-               packages.filter(isDocumentable(_)).map(overviewHtmlUtil.packageToHtml(_, template))
+               packages.filter(isDocumentablePackage(_)).map(overviewHtmlUtil.packageToHtml(_, template))
             }
             </p>
          </td></tr>
@@ -39,11 +36,16 @@ class OverviewFramePage(val template : DocTemplateEntity) extends HtmlPage {
 
 }
 
+/**
+ * Html presentation utils for overview frame.
+ *
+ * @author Filip Rogaczewski
+ */
 object overviewHtmlUtil {
 
    def packageToHtml(pack : DocTemplateEntity, from : DocTemplateEntity) : NodeSeq = {
       linkResolver.resolve(pack) match {
-         case Some(l) => <a href={l.link(from)}>{pack.qualifiedName}</a><br/>
+         case Some(l) => <a href={l.link(from)} target="packageFrame">{pack.qualifiedName}</a><br/>
          case None => <xml:node>{pack.qualifiedName}</xml:node><br/>
       }
    }
