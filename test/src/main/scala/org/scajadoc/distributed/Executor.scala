@@ -5,6 +5,8 @@ package org.scajadoc.distributed
  */
 object Executor {
 
+   final val execMessage = "Executing ..."
+
 	@throws(classOf[NoAlgorithmException])
 	def execute(algorithm : Option[Algorithm[Object]]) = {
 		algorithm match {

@@ -271,6 +271,7 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
     override def qualifiedName = optimize(inTemplate.qualifiedName + "#" + name)
     lazy val definitionName = optimize(inDefinitionTemplates.head.qualifiedName + "#" + name)
     def isUseCase = sym.isSynthetic
+     def isOverride = sym.isOverride
   }
   
   abstract class NonTemplateParamMemberImpl(sym: Symbol, inTpl: => DocTemplateImpl) extends NonTemplateMemberImpl(sym, inTpl) {

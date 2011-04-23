@@ -119,6 +119,7 @@ trait RootPackage extends Package
 
 trait NonTemplateMemberEntity extends MemberEntity {
   def isUseCase: Boolean
+  def isOverride : Boolean
 }
 
 /** A method (`def`) of a ''documentable'' class, trait or object. */

@@ -85,6 +85,7 @@ object linkResolver {
    }
 
    private def makeNonTemplateLink(ntm : NonTemplateMemberEntity) = {
+      val inh = ntm.inheritedFrom
       if (isInternal(ntm))
          Some(InternalLink(ntm))
       else {
@@ -110,8 +111,20 @@ object linkResolver {
    }
 
 
+   /**
+    * If the non-template entity is not inherited then it is a part of the documented project.
+    * If the entity's template is inherited from other templates but the entity is not overriden
+    * it is still internal.
+    */
    private def isInternal(ntm : NonTemplateMemberEntity) : Boolean = {
-      return ntm.inheritedFrom.size == 0
+      /* if (ntm.inheritedFrom.size > 0) {
+         val inhfrom = ntm.inheritedFrom
+         val isoverride = !ntm.isOverride
+         val inhHead = ntm.inheritedFrom.head
+         val inTmpl = ntm.inTemplate
+         val rxr = 0
+      }   */
+      return (ntm.inheritedFrom.size == 0 || (ntm.inheritedFrom.size > 0 && !ntm.isOverride))
    }
 
 }
