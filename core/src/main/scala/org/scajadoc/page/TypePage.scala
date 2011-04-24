@@ -71,7 +71,7 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
 	private def header() = {
 		<!-- ======== START OF CLASS DATA ======== -->
 		<h2>
-		<font size="-1">{classpathCache(template).packageCanonicalPath}</font>
+		<font size="-1">{extract.inPackage.qualifiedName}</font>
 		<br/>
          {extract.typ.capitalize} {extract.name}
 		</h2>

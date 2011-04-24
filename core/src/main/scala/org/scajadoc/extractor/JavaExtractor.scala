@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.DocTemplateEntity
+import tools.nsc.doc.model._
 
 /**
  * Utility class which extracts Java specific information from entities
@@ -10,8 +10,19 @@ import tools.nsc.doc.model.DocTemplateEntity
  */
 object javaExtractor {
 
-   val typeExtractor = new TypeExtractor
+   private final val fieldExtractor = new FieldExtractor
 
-   def extractTypeInfo(info : DocTemplateEntity) = typeExtractor.extract(info)
+   private final val methodExtractor = new MethodExtractor
+
+   private final val typeExtractor = new TypeExtractor
+
+   def extract(entity : MemberEntity) : Option[Extract] = {
+      entity match {
+         case v : Val => fieldExtractor.extract(v)
+         case m : NonTemplateMemberEntity => methodExtractor.extract(m)
+         case d : DocTemplateEntity => typeExtractor.extract(d)
+         case _ => None
+      }
+   }
 
 }

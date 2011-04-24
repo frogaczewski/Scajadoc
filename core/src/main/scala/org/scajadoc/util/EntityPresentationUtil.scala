@@ -169,12 +169,6 @@ object entityPresentationUtil {
 			"Variable"
 	}
 
-   @deprecated
-	def inType(entity : MemberEntity) = templateType(entity.inTemplate).toLowerCase
-
-   @deprecated
-	def inPackage(typ : DocTemplateEntity) = classpathCache(typ).packageCanonicalPath
-
 	/**
 	 * Returns name of the entity. In case of methods and constructors appends parameters
 	 * to the name.

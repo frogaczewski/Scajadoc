@@ -132,8 +132,6 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
 
 trait TypeExtract extends Extract {
 
-   def entity : DocTemplateEntity
-
    def isEnum : Boolean
    def isInterface : Boolean
    def isClass : Boolean

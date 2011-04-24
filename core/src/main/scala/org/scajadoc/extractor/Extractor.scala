@@ -43,6 +43,17 @@ trait Extract {
     */
    def name : String
 
+
+   /**
+    * Returns extracted entity.
+    */
+   def entity : MemberEntity
+
+   /**
+    * Returns name of the type, class, method, field, etc.
+    */
+   def typ : String
+
 }
 
 /**
@@ -63,14 +74,11 @@ trait MemberExtract extends Extract {
    def typ : String
 
    /**
-    * Returns extracted entity.
-    */
-   def entity : NonTemplateMemberEntity
-
-   /**
     * Returns true if the member is inherited from a class or an interface.
     */
    def isInherited : Boolean
+
+   def inTemplate : DocTemplateEntity
 }
 
 /**

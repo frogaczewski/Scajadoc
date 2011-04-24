@@ -2,8 +2,8 @@ package org.scajadoc.page
 
 import tools.nsc.doc.model.{DocTemplateEntity, MemberEntity, Package => ScalaPackage}
 import xml.{NodeBuffer, Node}
-import org.scajadoc.util.{entityPresentationUtil, classpathCache, entityTreeTraverser}
-import org.scajadoc.extractor.entityQueryContainer
+import org.scajadoc.extractor.{TypeExtract, TypeExtractor, entityQueryContainer}
+import org.scajadoc.util.{linkResolver, entityPresentationUtil, entityTreeTraverser}
 
 /**
  * Abstract base for generating allclasses-noframe.html and allclasses-frame.html files.
@@ -20,39 +20,25 @@ abstract class AbstractAllClassesPage(val rootPackage : ScalaPackage) extends Ht
 
 	def targetFrame : String
 
-	def body = {
-		var body = Nil:List[Node]
-		body ++= <font size="+1" class="FrameHeadingFont"><b>All Classes</b></font>
-		body ++= <br/>
-		entityTreeTraverser.collect(rootPackage, isType).sortBy(sort).foreach(e =>
-			body ++= new LinkedType {
-				override def name = e.rawName
-				override def link = classpathCache(e).docBaseFileClasspath + ".html"
-				override def title = "%s in %s".format(entityPresentationUtil.templateType(e.asInstanceOf[DocTemplateEntity]), entityPresentationUtil.inPackage(e.asInstanceOf[DocTemplateEntity]))
-				override def target = targetFrame
-			}
-		)
-		body
-	}
+   val typeExtractor = new TypeExtractor
 
-	implicit def linkedTypeToHtml(typ : LinkedType) : NodeBuffer = typ.toHTML
+	def body = {
+		<font size="+1" class="FrameHeadingFont"><b>All Classes</b></font><br/> ++
+      <xml:group>{entityTreeTraverser.collect(rootPackage, isType)
+            .sortBy(sort)
+            .map(_.asInstanceOf[DocTemplateEntity])
+            .map(e =>
+               allTypesHtmlUtil.allClassesElementHtml(typeExtractor.extract(e).get, rootPackage, targetFrame))}
+      </xml:group>
+	}
 
 }
 
-/**
- * Representation of linked type.
- *
- * @author Filip Rogaczewski
- */
-trait LinkedType {
+object allTypesHtmlUtil {
 
-	def name : String
+   def allClassesElementHtml(extract : TypeExtract, from : DocTemplateEntity, target : String) = {
+      val title = "%s in %s".format(extract.typ, extract.inPackage.qualifiedName)
+      <a href={linkResolver.resolve(extract.entity).get.link(from)} title={title} target={target}>{extract.name}</a><br/>
+   }
 
-	def link : String
-
-	def title : String
-
-	def target : String
-
-	def toHTML = <a href={link} title={title} target={target}>{name}</a><br/>
 }

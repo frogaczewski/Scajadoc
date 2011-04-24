@@ -36,6 +36,8 @@ class FieldExtractor extends Extractor[Val, FieldExtract] {
       def entity = info
 
       def isInherited = false
+
+      def inTemplate = info.inTemplate
    }
 
    class InheritedFieldImpl(info : Val) extends FieldExtractImpl(info) with InheritedMember {

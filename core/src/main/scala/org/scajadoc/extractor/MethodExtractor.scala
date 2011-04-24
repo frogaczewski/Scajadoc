@@ -61,7 +61,7 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
       def inTemplate = info.inTemplate
    }
 
-   class ConstructorExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) {
+   class ConstructorExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) with ConstructorExtract {
       override def name = info.inTemplate.rawName
    }
 
@@ -79,6 +79,6 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
  */
 trait MethodExtract extends MemberExtract {
 
-   def inTemplate : DocTemplateEntity
-
 }
+
+trait ConstructorExtract extends MethodExtract

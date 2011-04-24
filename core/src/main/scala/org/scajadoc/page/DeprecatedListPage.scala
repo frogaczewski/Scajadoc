@@ -162,7 +162,7 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	}
 
 	private def deprecatedToHtml(entity : MemberEntity) =
-		<tr bgcolor="white" class="TableRowColor"><td><a href={classpathCache(entity).docBaseClasspath}>{entityPresentationUtil.entityName(entity)}</a> {entityPresentationUtil.bodyToHtml(entity.deprecation.get)}</td></tr>
+		<tr bgcolor="white" class="TableRowColor"><td><a href={linkResolver.resolve(entity).get.link(rootPackage)}>{entityPresentationUtil.entityName(entity)}</a> {entityPresentationUtil.bodyToHtml(entity.deprecation.get)}</td></tr>
 
 	/**
 	 * Returns page title and menu with deprecated sections. 

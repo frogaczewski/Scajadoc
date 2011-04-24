@@ -1,8 +1,9 @@
 package org.scajadoc.page
 
 import xml.{Node, Elem}
-import tools.nsc.doc.model.{DocTemplateEntity, Val, Def, Constructor, MemberEntity, Package => ScalaPackage}
 import org.scajadoc.util.{entityPresentationUtil, entityTreeTraverser}
+import org.scajadoc.extractor._
+import tools.nsc.doc.model.{NonTemplateMemberEntity, DocTemplateEntity, Val, Def, Constructor, MemberEntity, Package => ScalaPackage}
 
 /**
  * Generate index-all.html file.  
@@ -35,19 +36,28 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	def body = {
 		var body = Nil:List[Node]
 		entityTreeTraverser.collect(rootPackage, collectCondition).sortBy(sort).foreach(e =>
-			if (e.isConstructor) {
-				body ++= new Indexable[Constructor] {
-					override def entity = e.asInstanceOf[Constructor]
-					override def name = entity.inTemplate.rawName + entityPresentationUtil.methodParams(entity.valueParams)
-					override def description = " - Constructor for class " + entity.inTemplate.name
-				}
+         javaExtractor.extract(e) match {
+            case Some(ext) => {
+               var description = ""
+               ext match {
+                  case t : TypeExtract => description = singleIndexPageHtmlUtil.typeDescription(t)
+                  case f : FieldExtract => description = singleIndexPageHtmlUtil.fieldDescription(f)
+                  case c : ConstructorExtract => description = singleIndexPageHtmlUtil.constructorDescription(c)
+                  case m : MethodExtract => description = singleIndexPageHtmlUtil.methodDescription(m)
+                  case _ => {}
+               }
+               body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(ext, description)
+            }
+            case None => {}
+         }
+      )
+			/* if (e.isConstructor) {
+            body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(
+               javaExtractor.extract(e, singleIndexPageHtmlUtil.constructorDescription)
 			} else if (e.isDef && entityPresentationUtil.isDocumentable(e.asInstanceOf[Def])) {
-				body ++= new Indexable[Def] {
-					override def entity = e.asInstanceOf[Def]
-					override def name = entity.rawName + entityPresentationUtil.methodParams(entity.valueParams)
-					override def description = " - %s in %s %s".format(entityPresentationUtil.methodType(entity),
-						entityPresentationUtil.inType(entity), entity.inTemplate.rawName)
-				}
+				body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(
+               javaExtractor.extract(e, )
+            )
 			} else if (e.isVal) {
 				body ++= new Indexable[Val] {
 					override def entity = e.asInstanceOf[Val]
@@ -63,12 +73,38 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
 						entityPresentationUtil.inPackage(entity))
 				}
 			}
-		)
+		)    */
 		body
 	}
 
 	implicit def indexableToXML(i : Indexable[_]) : Elem = i.toHTML
 	
+}
+
+object singleIndexPageHtmlUtil {
+
+   def constructorDescription(extract : MethodExtract) = {
+      "- Constructor for class " + extract.inTemplate.qualifiedName
+   }
+
+   def methodDescription(extract : MethodExtract) = {
+      " - %s in %s %s".format((extract.allocation.toString + " method").trim.capitalize,
+						extract.inTemplate.qualifiedName, extract.name)
+   }
+
+   def fieldDescription(extract : FieldExtract) = {
+      " - %s in %s %s".format((extract.allocation.toString + " variable").trim.capitalize,
+						extract.inTemplate.qualifiedName, extract.name)
+   }
+
+   def typeDescription(extract : TypeExtract) = {
+      " - %s in %s".format(extract.typ, extract.inPackage.qualifiedName)
+   }
+
+   def extractToIndexableHtml(extract : Extract, description : String) = {
+      <dl><dt><b>{extract.name}</b></dt><dd>{description} {entityPresentationUtil.short(extract.entity.comment)} </dd></dl>
+   }
+
 }
 
 /**

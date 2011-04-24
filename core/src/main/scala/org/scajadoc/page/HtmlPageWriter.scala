@@ -3,24 +3,34 @@ package org.scajadoc.page
 import java.nio.channels.Channels
 import java.io.{File => JFile, FileOutputStream}
 import org.scajadoc.settings
-import org.scajadoc.util.classpathCache
+import tools.nsc.doc.model.{Package => ScalaPackage}
+import org.scajadoc.util.linkResolver
 
 /**
  * Object which persists all page classes on disk. 
  *
  * @author Filip Rogaczewski
  */
-object htmlPageWriter {
+class HtmlPageWriter(val rootPackage : ScalaPackage) {
 
-	def createFile(page : HtmlPage) : JFile = {
-		val classpath = classpathCache(page.entity)
-		val dir = new JFile(settings.outdir.value + JFile.separator + classpath.docPackageClasspath)
-		if (!dir.exists)
-			dir.mkdirs
-		val file = new JFile(dir, page.file)
-		if (!file.exists)
-			file.createNewFile
-		file
+   /**
+    * Creates a file in a page's path.
+    */
+	private def createFile(page : HtmlPage) : JFile = {
+		val link = linkResolver.resolve(page.entity).get.link(rootPackage)
+      var path = (settings.outdir.value + JFile.separator + link).replace("/", JFile.separator)
+      if (page.entity.isInstanceOf[ScalaPackage] && page.entity.asInstanceOf[ScalaPackage].isRootPackage)
+         path += page.file
+      if (page.isInstanceOf[PackageSummary])
+         path = path.replace(settings.packageFrameFile, page.filename)
+      val file = new JFile(path)
+      if (!file.getParentFile.exists) {
+         file.getParentFile.mkdirs
+      }
+      if (!file.exists) {
+         file.createNewFile
+      }
+      file
 	}
 
 	/**

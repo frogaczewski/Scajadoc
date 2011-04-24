@@ -36,6 +36,8 @@ class ParameterExtractor extends Extractor[HigherKinded, ParametersExtract] {
          def name = ""
          def parameters = Nil
          def text = ""
+         def typ = ""
+         def entity = null
       })
    }
 

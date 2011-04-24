@@ -143,7 +143,8 @@ abstract class Link(entity : Entity) {
          builder ++= "/"
          builder ++= settings.packageFrameFile
       }
-      builder ++= settings.outputFormat
+      if (!isRootPackage(entity))
+         builder ++= settings.outputFormat
       builder
    }
 
