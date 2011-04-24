@@ -34,53 +34,35 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	def headers = ""
 
 	def body = {
+      implicit def stringToOption(text : String) = Some(text)
 		var body = Nil:List[Node]
-		entityTreeTraverser.collect(rootPackage, collectCondition).sortBy(sort).foreach(e =>
-         javaExtractor.extract(e) match {
-            case Some(ext) => {
-               var description = ""
-               ext match {
-                  case t : TypeExtract => description = singleIndexPageHtmlUtil.typeDescription(t)
-                  case f : FieldExtract => description = singleIndexPageHtmlUtil.fieldDescription(f)
-                  case c : ConstructorExtract => description = singleIndexPageHtmlUtil.constructorDescription(c)
-                  case m : MethodExtract => description = singleIndexPageHtmlUtil.methodDescription(m)
-                  case _ => {}
+		entityTreeTraverser.collect(rootPackage, collectCondition).sortBy(sort)
+         .map(javaExtractor.extract(_)).collect {case x if (x.isDefined) => x.get}
+         .foreach(ext => {
+            var description : Option[String] = None
+            ext match {
+               case t : TypeExtract => description = singleIndexPageHtmlUtil.typeDescription(t)
+               case f : FieldExtract => description = singleIndexPageHtmlUtil.fieldDescription(f)
+               case c : ConstructorExtract => description = singleIndexPageHtmlUtil.constructorDescription(c)
+               case m : MethodExtract => {
+                  if (!m.isInherited)
+                     description = singleIndexPageHtmlUtil.methodDescription(m)
                }
-               body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(ext, description)
+               case _ => {}
             }
-            case None => {}
-         }
-      )
-			/* if (e.isConstructor) {
-            body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(
-               javaExtractor.extract(e, singleIndexPageHtmlUtil.constructorDescription)
-			} else if (e.isDef && entityPresentationUtil.isDocumentable(e.asInstanceOf[Def])) {
-				body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(
-               javaExtractor.extract(e, )
-            )
-			} else if (e.isVal) {
-				body ++= new Indexable[Val] {
-					override def entity = e.asInstanceOf[Val]
-					override def name = entity.rawName
-					override def description = " - %s in %s %s".format(entityPresentationUtil.variableType(entity),
-						entityPresentationUtil.inType(e), entity.inTemplate.rawName)
-				}
-			} else if (e.isTemplate && !e.asInstanceOf[DocTemplateEntity].isPackage) {
-				body ++= new Indexable[DocTemplateEntity] {
-					override def entity = e.asInstanceOf[DocTemplateEntity]
-					override def name = entity.rawName
-					override def description = " - %s in %s".format(entityPresentationUtil.templateType(entity),
-						entityPresentationUtil.inPackage(entity))
-				}
-			}
-		)    */
+            if (description.isDefined)
+               body ++= singleIndexPageHtmlUtil.extractToIndexableHtml(ext, description.get)
+      })
 		body
 	}
 
-	implicit def indexableToXML(i : Indexable[_]) : Elem = i.toHTML
-	
 }
 
+/**
+ * Html utils for single index page.
+ *
+ * @author Filip Rogaczewski
+ */
 object singleIndexPageHtmlUtil {
 
    def constructorDescription(extract : MethodExtract) = {
@@ -104,24 +86,5 @@ object singleIndexPageHtmlUtil {
    def extractToIndexableHtml(extract : Extract, description : String) = {
       <dl><dt><b>{extract.name}</b></dt><dd>{description} {entityPresentationUtil.short(extract.entity.comment)} </dd></dl>
    }
-
-}
-
-/**
- * Interface for indexable entities data holder.
- *
- * @author Filip Rogaczewski
- */
-trait Indexable[E <: MemberEntity] {
-
-	def name : String
-
-	def entity : E
-
-	def description : String
-
-	def firstSentence : String = entityPresentationUtil.short(entity.comment)
-
-	def toHTML : xml.Elem = <dl><dt><b>{ name }</b></dt><dd>{description} {firstSentence} </dd></dl>
 
 }
