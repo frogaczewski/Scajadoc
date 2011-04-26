@@ -33,6 +33,7 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
 
 	def body = {
 		var body = Nil:List[Node]
+      body ++= typePageHtmlUtil.navigationBarHtml(template)
 		body ++= header
       if (extract.isClass || extract.isEnum) {
          body ++= typeTree
@@ -249,7 +250,7 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
  *
  * @author Filip Rogaczewski
  */
-object typePageHtmlUtil {
+object typePageHtmlUtil extends NavigationBarHtmlUtil {
 
    /**
     * Makes a html summary of the field.

@@ -23,7 +23,7 @@ object resourceManager {
    }
 
    def copyResources() = {
-      def writeIndex(filename : String, outdir : File) = {
+      def writeTemplate(filename : String, outdir : File) = {
          val input = Source.fromInputStream(getClass.getResourceAsStream(filename)).mkString
          val output = input
                .replace("$scajadoc-generation-time", new SimpleDateFormat("dd.MM.yyyy").format(new Date()))
@@ -46,7 +46,8 @@ object resourceManager {
       val outdir = new File(settings.outdir.value)
       copyFile("/inherit.gif")
       copyFile("/stylesheet.css")(outdir)
-      writeIndex("/index.html", outdir)
+      writeTemplate("/index.html", outdir)
+      writeTemplate("/help-doc.html", outdir)
    }
 
    /**

@@ -4,8 +4,8 @@ import extractor.entityQueryContainer
 import page._
 import tools.nsc.doc.Universe
 import tools.nsc.doc.model.DocTemplateEntity
-import util.{resourceManager, entityTreeTraverser}
 import collection.mutable.ListBuffer
+import util.{typeSlider, resourceManager, entityTreeTraverser}
 
 /**
  * Entry point for generating html front-end from universe created
@@ -31,10 +31,12 @@ class FrontEndBuilder(val universe : Universe) {
 
 
 	def build() = {
+      val types = entityTreeTraverser.collect(universe.rootPackage, isType).map(_.asInstanceOf[DocTemplateEntity])
+      typeSlider.init(types)
       resourceManager.copyResources
       val writer = new HtmlPageWriter(universe.rootPackage)
 		indexPages.foreach(page => writer.write(page))
-		entityTreeTraverser.collect(universe.rootPackage, isType).foreach(entity =>
+		types.foreach(entity =>
          writer.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
       entityTreeTraverser.collect(universe.rootPackage, isPackage)

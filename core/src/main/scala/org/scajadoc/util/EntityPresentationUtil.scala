@@ -131,45 +131,6 @@ object entityPresentationUtil {
 	}
 
 	/**
-	 * Returns type of the template entity.
-	 *
-	 * TODO add exception handling
-	 * TODO add annotation handling
-	 * TODO enum handling
-	 */
-   @deprecated
-	def templateType(template : DocTemplateEntity) = {
-		if (template.isPackage)
-			"Package"
-		else if (template.isTrait)
-			"Interface"
-		else
-			"Class"
-	}
-
-	/**
-	 * Returns type of the method. Static or instance.
-	 */
-   @deprecated
-	def methodType(definition : Def) = {
-		if (definition.inTemplate.isObject)
-			"Static method"
-		else
-			"Method"
-	}
-
-	/**
-	 * Returns type of the variable. Static or instance.
-	 */
-   @deprecated
-	def variableType(variable : Val) = {
-		if (variable.inTemplate.isObject)
-			"Static variable"
-		else
-			"Variable"
-	}
-
-	/**
 	 * Returns name of the entity. In case of methods and constructors appends parameters
 	 * to the name.
 	 */
