@@ -3,6 +3,7 @@ package org.scajadoc.page
 import xml.NodeSeq
 import tools.nsc.doc.model.MemberEntity
 import org.scajadoc.settings
+import org.scajadoc.extractor.entityQueryContainer
 
 /**
  * Trait for html pages. 
@@ -10,6 +11,8 @@ import org.scajadoc.settings
  * @author Filip Rogaczewski
  */
 trait HtmlPage {
+
+   import entityQueryContainer._
 
 	/**
 	 * Sorts member entities collected by the collectCondition.
@@ -39,7 +42,7 @@ trait HtmlPage {
 			<head>
 				<title>{ title }</title>
 				<meta http-equiv="content-type" content={ "text/html; charset=" + encoding }/>
-            <link rel="stylesheet" type="text/css" href="stylesheet.css" title="Style" />
+            <link rel="stylesheet" type="text/css" href={entity.toRoot.filter(isPackage(_)).map(e => "../").mkString + "stylesheet.css"} title="Style" />
 				{ headers }
 			</head>
          <body>

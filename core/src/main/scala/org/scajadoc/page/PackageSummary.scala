@@ -4,8 +4,8 @@ import tools.nsc.doc.model.DocTemplateEntity
 import org.scajadoc.settings
 import collection.immutable.List._
 import org.scajadoc.extractor._
-import org.scajadoc.util.{entityPresentationUtil, linkResolver, entityTreeTraverser}
 import xml.{NodeSeq, Node}
+import org.scajadoc.util.{NavigationBarHtmlUtil, entityPresentationUtil, linkResolver, entityTreeTraverser}
 
 /**
  * Generates package-summary.html file.
@@ -31,6 +31,7 @@ class PackageSummary(val pack : DocTemplateEntity) extends HtmlPage {
       val exceptions = types.filter(isException)
       val classes = types -- interfaces -- enums -- exceptions
       var bodyHtml = Nil:List[Node]
+      bodyHtml ++= packageSummaryHtmlUtil.navigationBarHtml(pack)
       bodyHtml ++= packageSummaryHtmlUtil.packageHeaderHtml(pack)
       bodyHtml ++= packageSummaryHtmlUtil.typesToHtml(interfaces, "Interfaces", pack)
       bodyHtml ++= packageSummaryHtmlUtil.typesToHtml(classes, "Classes", pack)
@@ -46,7 +47,7 @@ class PackageSummary(val pack : DocTemplateEntity) extends HtmlPage {
  *
  * @author Filip Rogaczewski
  */
-object packageSummaryHtmlUtil {
+object packageSummaryHtmlUtil extends NavigationBarHtmlUtil {
 
    val typeExtractor = new TypeExtractor
 

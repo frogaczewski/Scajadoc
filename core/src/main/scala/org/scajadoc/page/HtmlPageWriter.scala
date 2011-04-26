@@ -21,7 +21,7 @@ class HtmlPageWriter(val rootPackage : ScalaPackage) {
       var path = (settings.outdir.value + JFile.separator + link).replace("/", JFile.separator)
       if (page.entity.isInstanceOf[ScalaPackage] && page.entity.asInstanceOf[ScalaPackage].isRootPackage)
          path += page.file
-      if (page.isInstanceOf[PackageSummary])
+      if (page.isInstanceOf[PackageSummary] || page.isInstanceOf[PackageTree])
          path = path.replace(settings.packageFrameFile, page.filename)
       val file = new JFile(path)
       if (!file.getParentFile.exists) {

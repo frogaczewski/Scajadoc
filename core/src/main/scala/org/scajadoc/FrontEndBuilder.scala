@@ -32,18 +32,18 @@ class FrontEndBuilder(val universe : Universe) {
 
 	def build() = {
       val types = entityTreeTraverser.collect(universe.rootPackage, isType).map(_.asInstanceOf[DocTemplateEntity])
-      typeSlider.init(types)
+      val packages = entityTreeTraverser.collect(universe.rootPackage, isPackage).map(_.asInstanceOf[DocTemplateEntity]).filter(isDocumentablePackage(_))
+      typeSlider.init(types, packages)
       resourceManager.copyResources
       val writer = new HtmlPageWriter(universe.rootPackage)
 		indexPages.foreach(page => writer.write(page))
 		types.foreach(entity =>
          writer.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
-      entityTreeTraverser.collect(universe.rootPackage, isPackage)
-         .map(_.asInstanceOf[DocTemplateEntity])
-         .filter(isDocumentablePackage(_)).foreach(e => {
+      packages.foreach(e => {
             writer.write(new PackagePage(e))
             writer.write(new PackageSummary(e))
+            writer.write(new PackageTree(e))
       })
 	}
 
