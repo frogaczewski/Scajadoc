@@ -1,6 +1,6 @@
 package org.scajadoc.util
 
-import tools.nsc.doc.model.DocTemplateEntity
+import tools.nsc.doc.model._
 import org.scajadoc.extractor.entityQueryContainer
 import org.scajadoc.settings
 
@@ -20,7 +20,10 @@ trait NavigationBarHtmlUtil {
       tmp.toRoot.filter(isPackage(_)).map(e => "../").mkString
    }
 
-   def navigationBarHtml(tmp : DocTemplateEntity) = {
+   def navigationBarHtml(tmp : DocTemplateEntity, simpleNavigation : Boolean = false,
+                              packageSummary : Boolean = false, packageTree : Boolean= false,
+                              index : Boolean = false, overview : Boolean = false,
+                              deprecated : Boolean = false) = {
       def rootPackage = tmp.toRoot.filter(isRootPackage).head
       val toRoot = wayToRoot(tmp)
       <!-- ========= START OF TOP NAVBAR ======= -->
@@ -32,13 +35,41 @@ trait NavigationBarHtmlUtil {
                <a name="navbar_top_firstrow"><!-- --></a>
                <table border="0" cellpadding="0" cellspacing="3" summary="">
                   <tr align="center" valign="top">
-                     <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "overview-summary.html"}><font class="NavBarFont1"><b>Overview</b></font></a></td>
-                     <td bgcolor="#EEEEFF" class="NavBarCell1"><a href="package-summary.html"><font class="NavBarFont1"><b>Package</b></font></a></td>
-                     <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Class</b></font></td>
+                     {
+                        if (overview)
+                           <td bgcolor="#EEEEFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Overview</b></font></td>
+                        else
+                           <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "overview-summary.html"}><font class="NavBarFont1"><b>Overview</b></font></a></td>
+                     }
+                     {
+                        if (packageSummary)
+                           <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Package</b></font></td>
+                        else if (!tmp.isPackage || packageTree)
+                           <td bgcolor="#EEEEFF" class="NavBarCell1"><a href="package-summary.html"><font class="NavBarFont1"><b>Package</b></font></a></td>
+                        else
+                           <td bgcolor="#FFFFFF" class="NavBarCell1"><font class="NavBarFont1">Package</font></td>
+                     }
+                     {
+                        if (!tmp.isPackage)
+                           <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Class</b></font></td>
+                        else
+                           <td bgcolor="#FFFFFF" class="NavBarCell1"><font class="NavBarFont1">Class</font></td>
+
+                     }
                      <!--<td bgcolor="#EEEEFF" class="NavBarCell1"><a href="class-use/.html"><font class="NavBarFont1"><b>Use</b></font></a></td> -->
                      <td bgcolor="#EEEEFF" class="NavBarCell1"><a href="package-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
-                     <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "deprecated-list.html"}><font class="NavBarFont1"><b>Deprecated</b></font></a></td>
-                     <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "index-all.html"}><font class="NavBarFont1"><b>Index</b></font></a></td>
+                     {
+                        if (deprecated)
+                           <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Deprecated</b></font></td>
+                        else
+                           <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "deprecated-list.html"}><font class="NavBarFont1"><b>Deprecated</b></font></a></td>
+                     }
+                     {
+                        if (index)
+                           <td bgcolor="#EEEEFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Index</b></font></td>
+                        else
+                           <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "index-all.html"}><font class="NavBarFont1"><b>Index</b></font></a></td>
+                     }
                      <td bgcolor="#EEEEFF" class="NavBarCell1"><a href={toRoot + "help-doc.html"}><font class="NavBarFont1"><b>Help</b></font></a></td>
                   </tr>
                </table>
@@ -48,24 +79,29 @@ trait NavigationBarHtmlUtil {
             </td>
          </tr>
          <tr>
+            {
+               if (!simpleNavigation)
+                  <td bgcolor="white" class="NavBarCell2">
+                     <font size="-2">
+                        {
+                           if (tmp.isPackage)
+                              typeSlider.prevPackage(tmp) ++ typeSlider.nextPackage(tmp)
+                           else
+                              typeSlider.prevClass(tmp) ++ typeSlider.nextClass(tmp)
+                        }
+                     </font>
+                  </td>
+               else
+                  <td bgcolor="white" class="NavBarCell2"></td>
+            }
             <td bgcolor="white" class="NavBarCell2">
                <font size="-2">
-                  {
-                     if (tmp.isPackage)
-                        typeSlider.prevPackage(tmp) ++ typeSlider.nextPackage(tmp)
-                     else
-                        typeSlider.prevClass(tmp) ++ typeSlider.nextClass(tmp)
-                  }
-                  </font>
-               </td>
-               <td bgcolor="white" class="NavBarCell2">
-                  <font size="-2">
-                     <a href={toRoot + "index.html?" + linkResolver.resolve(tmp).get.link(rootPackage)} target="_top"><b>FRAMES</b></a>&nbsp;
-                     &nbsp;<a href={tmp.rawName + ".html"} target="_top"><b>NO FRAMES</b></a>&nbsp;
-                     <noscript>
-                        <a href={toRoot + "allclasses-noframe.html"}><b>All Classes</b></a>
-                     </noscript>
-                  </font>
+                  <a href={toRoot + "index.html?" + linkResolver.resolve(tmp).get.link(rootPackage)} target="_top"><b>FRAMES</b></a>&nbsp;
+                  &nbsp;<a href={tmp.rawName + ".html"} target="_top"><b>NO FRAMES</b></a>&nbsp;
+                  <noscript>
+                     <a href={toRoot + "allclasses-noframe.html"}><b>All Classes</b></a>
+                  </noscript>
+               </font>
             </td>
          </tr>
          {

@@ -3,7 +3,8 @@ package org.scajadoc.page
 import tools.nsc.doc.model.DocTemplateEntity
 import org.scajadoc.extractor.entityQueryContainer
 import org.scajadoc.settings
-import org.scajadoc.util.{linkResolver, entityPresentationUtil, entityTreeTraverser}
+import org.scajadoc.util.{NavigationBarHtmlUtil, linkResolver, entityPresentationUtil, entityTreeTraverser}
+import xml.Node
 
 /**
  * Generates welcome page - overview-summary.html.
@@ -24,7 +25,9 @@ class OverviewSummaryPage(val template : DocTemplateEntity) extends HtmlPage {
 
    def body = {
       val packages = entityTreeTraverser.collect(template, isPackage).sortBy(m => m.qualifiedName).map(_.asInstanceOf[DocTemplateEntity])
-      <hr /><center><h1>{settings.javadocTitle} Documentation</h1></center>
+      var body = Nil:List[Node]
+      body ++= overviewSummaryHtmlUtil.navigationBarHtml(entity, overview = true, simpleNavigation = true)
+      body ++= {<hr /><center><h1>{settings.javadocTitle} Documentation</h1></center>
       <p>This document is the API specification for {settings.javadocTitle}</p>
       <p>
          <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
@@ -35,11 +38,12 @@ class OverviewSummaryPage(val template : DocTemplateEntity) extends HtmlPage {
             </tr>
             {packages.filter(isDocumentablePackage(_)).map(overviewSummaryHtmlUtil.packageToHtml(_, template))}
          </table>
-      </p>
+      </p> }
+      body
    }
 }
 
-object overviewSummaryHtmlUtil {
+object overviewSummaryHtmlUtil extends NavigationBarHtmlUtil {
 
    def packageToHtml(pack : DocTemplateEntity, from : DocTemplateEntity) = {
       val comp = pack.companion

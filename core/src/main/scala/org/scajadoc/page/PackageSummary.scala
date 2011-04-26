@@ -31,7 +31,7 @@ class PackageSummary(val pack : DocTemplateEntity) extends HtmlPage {
       val exceptions = types.filter(isException)
       val classes = types -- interfaces -- enums -- exceptions
       var bodyHtml = Nil:List[Node]
-      bodyHtml ++= packageSummaryHtmlUtil.navigationBarHtml(pack)
+      bodyHtml ++= packageSummaryHtmlUtil.navigationBarHtml(pack, packageSummary = true)
       bodyHtml ++= packageSummaryHtmlUtil.packageHeaderHtml(pack)
       bodyHtml ++= packageSummaryHtmlUtil.typesToHtml(interfaces, "Interfaces", pack)
       bodyHtml ++= packageSummaryHtmlUtil.typesToHtml(classes, "Classes", pack)

@@ -1,9 +1,9 @@
 package org.scajadoc.page
 
-import xml.{Node, Elem}
-import org.scajadoc.util.{entityPresentationUtil, entityTreeTraverser}
+import xml.Node
 import org.scajadoc.extractor._
-import tools.nsc.doc.model.{NonTemplateMemberEntity, DocTemplateEntity, Val, Def, Constructor, MemberEntity, Package => ScalaPackage}
+import tools.nsc.doc.model.{MemberEntity, Package => ScalaPackage}
+import org.scajadoc.util.{NavigationBarHtmlUtil, entityPresentationUtil, entityTreeTraverser}
 
 /**
  * Generate index-all.html file.  
@@ -36,6 +36,7 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
 	def body = {
       implicit def stringToOption(text : String) = Some(text)
 		var body = Nil:List[Node]
+      body ++= singleIndexPageHtmlUtil.navigationBarHtml(entity, simpleNavigation = true, index = true)
 		entityTreeTraverser.collect(rootPackage, collectCondition).sortBy(sort)
          .map(javaExtractor.extract(_)).collect {case x if (x.isDefined) => x.get}
          .foreach(ext => {
@@ -63,7 +64,7 @@ class SingleIndexPage(val rootPackage : ScalaPackage) extends HtmlPage {
  *
  * @author Filip Rogaczewski
  */
-object singleIndexPageHtmlUtil {
+object singleIndexPageHtmlUtil extends NavigationBarHtmlUtil {
 
    def constructorDescription(extract : MethodExtract) = {
       "- Constructor for class " + extract.inTemplate.qualifiedName

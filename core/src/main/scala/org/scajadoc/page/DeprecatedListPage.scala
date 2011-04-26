@@ -142,10 +142,13 @@ class DeprecatedListPage(val rootPackage : ScalaPackage) extends HtmlPage {
 
 	def entity = rootPackage
 
+   object deprecatedHtmlUtils extends NavigationBarHtmlUtil
+
 	def body = {
 		for (e <- deprecatedApi.iterator)
 			deprecatedEntities += (e._1 -> entityTreeTraverser.collect(rootPackage, e._2))
 		var body = Nil:List[Node]
+      body ++= deprecatedHtmlUtils.navigationBarHtml(entity, deprecated = true, simpleNavigation = true)
 		body ++= header
 		for (e <- deprecatedEntities.iterator.filter((e : (DeprecatedType, List[MemberEntity])) => !e._2.isEmpty))
 			body ++= deprecatedEntity(e._1, e._2)

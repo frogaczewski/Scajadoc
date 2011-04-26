@@ -6,6 +6,7 @@ import tools.nsc.doc.Universe
 import tools.nsc.doc.model.DocTemplateEntity
 import collection.mutable.ListBuffer
 import util.{typeSlider, resourceManager, entityTreeTraverser}
+import collection.immutable.List._
 
 /**
  * Entry point for generating html front-end from universe created
@@ -40,7 +41,7 @@ class FrontEndBuilder(val universe : Universe) {
 		types.foreach(entity =>
          writer.write(new TypePage(entity.asInstanceOf[DocTemplateEntity]))
 		)
-      packages.foreach(e => {
+      (universe.rootPackage :: packages).foreach(e => {
             writer.write(new PackagePage(e))
             writer.write(new PackageSummary(e))
             writer.write(new PackageTree(e))

@@ -52,15 +52,15 @@ object linkResolverTest extends Specification("Specification of link resolver") 
          linkedTemplate.isPackage returns false
          linkedTemplate.isClass returns true
          linkedTemplate.name returns "String"
-         linkedTemplate.rawName returns "String"
+//         linkedTemplate.rawName returns "String"
          linkedTemplate.toRoot returns {
             val lang = mock[DocTemplateEntity]
             lang.name returns "lang"
-            lang.rawName returns "lang"
+//            lang.rawName returns "lang"
             lang.isPackage returns true
             val java = mock[DocTemplateEntity]
             java.name returns "java"
-            java.rawName returns "java"
+//            java.rawName returns "java"
             java.isPackage returns true
             List(linkedTemplate, lang, java)
          }
