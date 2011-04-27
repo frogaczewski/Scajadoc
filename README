@@ -18,13 +18,32 @@ Building and executing Scajadoc.
 			<plugin>
 				<groupId>org.scajadoc</groupId>
 				<artifactId>scajadoc-maven-plugin</artifactId>
-				<version>0.1-SNAPSHOT</version>
+				<version>1.0.ALPHA</version>
 				<configuration>
 					<scalaVersion>2.8.1</scalaVersion>
+					<links>
+					   <param>link to root of the external APIs (for instance: http://download.oracle.com/javase/6/docs/api/)</param>
+					</links>
 				</configuration>
 			</plugin>
 
 			and execute:
 			
-			mvn scajadoc:run (TODO change it)
+			mvn scajadoc:run
+
+			Documentation will be generated in target/scajadoc directory.
 			TODO automatic discovery of scala version
+
+      sample configuration:
+
+      <plugin>
+			<groupId>org.scajadoc</groupId>
+			<artifactId>scajadoc-maven-plugin</artifactId>
+			<version>1.0.ALPHA</version>
+			<configuration>
+				<scalaVersion>2.8.1</scalaVersion>
+				<links>
+					<param>http://download.oracle.com/javase/6/docs/api/</param>
+				</links>
+			</configuration>
+		</plugin>

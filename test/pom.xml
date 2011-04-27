@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>org.scajadoc</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0.ALPHA</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.scajadoc</groupId>
 	<artifactId>test</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0.ALPHA</version>
 	<inceptionYear>2011</inceptionYear>
 
 	<dependencies>

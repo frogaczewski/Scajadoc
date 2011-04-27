@@ -18,8 +18,9 @@ object Scajadoc {
 	def build(sourcepath : String,
 	          destination : String,
 	          classpath : java.util.Set[String],
-	          projectName : String) = {
-		val docSettings = DocSettings(sourcepath, destination, classpath, projectName)
+	          projectName : String,
+             links : Array[String]) = {
+		val docSettings = DocSettings(sourcepath, destination, classpath, projectName, links)
 		process(docSettings)
 	}
 

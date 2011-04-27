@@ -80,12 +80,15 @@ object DocSettings {
 	def apply(sourcepath : String,
 	          destination : String,
 	          classpath : java.util.Set[String],
-	          projectName : String) = {
+	          projectName : String,
+             links : Array[String]) = {
 		val settings = new DocSettings
 		settings.sourcepath = getSources(new File(sourcepath))
 		settings.classpath = classpath.mkString(File.pathSeparator)
 		settings.docDestinationDir = getDestinationDir(destination)
 		settings.javadocTitle = projectName
+      if (links != null)
+         settings.links = links.toList
 		settings
 	}
 

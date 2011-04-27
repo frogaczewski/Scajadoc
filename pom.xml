@@ -7,18 +7,25 @@
 	<parent>
 		<groupId>org.scajadoc</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0.ALPHA</version>
 		<relativePath>parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.scajadoc</groupId>
 	<artifactId>scajadoc</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0.ALPHA</version>
 	<inceptionYear>2011</inceptionYear>
 	
 	<name>Scajadoc distribution</name>
 	<description>Builds the complete scajadoc distribution bundles</description>
 	<packaging>pom</packaging>
+
+	<developers>
+		<developer>
+			<name>Filip Rogaczewski</name>
+			<email>frogaczewski@gmail.com</email>
+		</developer>
+	</developers>
 
 	<modules>
 		<module>core</module>

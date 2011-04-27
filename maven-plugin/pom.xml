@@ -8,22 +8,15 @@
 	<parent>
 		<groupId>org.scajadoc</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0.ALPHA</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.scajadoc</groupId>
 	<artifactId>scajadoc-maven-plugin</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0.ALPHA</version>
 	<packaging>maven-plugin</packaging>
 	<inceptionYear>2011</inceptionYear>
-
-	<developers>
-		<developer>
-			<name>Filip Rogaczewski</name>
-			<email>frogaczewski@gmail.com</email>
-		</developer>
-	</developers>
 	
 	<repositories>
 		<repository>
@@ -45,7 +38,7 @@
 		<dependency>
 			<groupId>org.scajadoc</groupId>
 			<artifactId>core</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>1.0.ALPHA</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -79,18 +72,6 @@
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/</testSourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.scajadoc</groupId>
-				<artifactId>maven</artifactId>
-				<version>0.1-SNAPSHOT</version>
-				<configuration>
-					<destination>destination</destination>
-					<scalaVersion>2.8.1</scalaVersion>
-				</configuration>
-			</plugin>
-		</plugins>
 	</build>
 
 </project>

@@ -6,7 +6,7 @@
 
 	<groupId>org.scajadoc</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0.ALPHA</version>
 	<inceptionYear>2011</inceptionYear>
 	<name>Scajadoc Common Parent</name>
 	<description>Scajadoc common parent POM module</description>

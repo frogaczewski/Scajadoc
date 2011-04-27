@@ -3,11 +3,11 @@ package org.scajadoc.maven;
 import org.scajadoc.Scajadoc;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Entry point for scajadoc maven plugin.
  *
- * TODO links resolving
  *
  * @author Filip Rogaczewski
  * @goal run
@@ -27,6 +27,13 @@ public class ScajadocMojo extends AbstractScajadocMojo {
 	 */
 	private String destination;
 
+   /**
+    * List of external APIs.
+    *
+    * @parameter
+    */
+   private String[] links;
+
 	/**
 	 * @parameter
 	 */
@@ -38,7 +45,8 @@ public class ScajadocMojo extends AbstractScajadocMojo {
 				getSourcepath(),
 				getOutputDir().getAbsolutePath(),
 				getClasspath(),
-				getProjectName()
+				getProjectName(),
+            getLinks()
 		);
 	}
 
@@ -63,5 +71,13 @@ public class ScajadocMojo extends AbstractScajadocMojo {
 
    public void setOutputDir(File outputDir) {
       this.outputDir = outputDir;
+   }
+
+   public String[] getLinks() {
+      return links;
+   }
+
+   public void setLinks(String[] links) {
+      this.links = links;
    }
 }

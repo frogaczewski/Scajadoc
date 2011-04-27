@@ -7,21 +7,13 @@
 	<parent>
 		<groupId>org.scajadoc</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0.ALPHA</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.scajadoc</groupId>
 	<artifactId>core</artifactId>
-	<version>0.1-SNAPSHOT</version>
-	<inceptionYear>2010</inceptionYear>
-
-	<developers>
-		<developer>
-			<name>Filip Rogaczewski</name>
-			<email>frogaczewski@gmail.com</email>
-		</developer>
-	</developers>
+	<version>1.0.ALPHA</version>
 
 	<repositories>
 		<repository>
