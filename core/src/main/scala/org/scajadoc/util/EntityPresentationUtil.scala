@@ -38,7 +38,7 @@ object entityPresentationUtil {
 		case Underline(in) => <u>{ inlineToHtml(in) }</u>
 		case Superscript(in) => <sup>{ inlineToHtml(in) }</sup>
 		case Subscript(in) => <sub>{ inlineToHtml(in) }</sub>
-		case ModelLink(raw, title) => <a href={ raw }>{ inlineToHtml(title) }</a>
+		case Link(raw, title) => <a href={ raw }>{ inlineToHtml(title) }</a>
 		case EntityLink(entity) => {null}
 		case Monospace(text) => <code>{ xml.Text(text) }</code>
 		case Text(text) => xml.Text(text)
@@ -88,58 +88,70 @@ object entityPresentationUtil {
 	 * @param comment - comment option
 	 * @return first sentence of comment
 	 */
-	def short(comment : Option[Comment]) = comment match {
-		case Some(comment) => entityPresentationUtil.inlineToHtml(comment.short).text
-		case None => ""
-	}
+	def short(comment : Option[Comment]) = {
+      try {
+         comment match {
+            case Some(comment) => entityPresentationUtil.inlineToHtml(comment.short).text
+            case None => ""
+         }
+      } catch {
+         case e : Exception => println("comment with exception " + comment.toString)
+      }
+   }
 
    /**
     * Returns full comment.
     */
-   def full(comment : Option[Comment]) = comment match {
-      case Some(comment) => entityPresentationUtil.bodyToHtml(comment.body)
-      case None => ""
+   def full(comment : Option[Comment]) = {
+      try {
+         comment match {
+            case Some(comment) => entityPresentationUtil.bodyToHtml(comment.body)
+            case None => ""
+         }
+      } catch {
+         case e : Exception => println("comment with exception " + comment.toString)
+      }
    }
 
 
-	/**
-	 * Returns parameters of the entity.
-	 * TODO generic handling
-	 */
-   @deprecated
-	def params(executable : NonTemplateMemberEntity) = {
-		executable match {
-			case d : Def => methodParams(d.valueParams)
-			case c : Constructor => methodParams(c.valueParams)
-			case _ => ""
-		}
-	}
+      /**
+       * Returns parameters of the entity.
+       * TODO generic handling
+       */
+      @deprecated
+      def params(executable : NonTemplateMemberEntity) = {
+         executable match {
+            case d : Def => methodParams(d.valueParams)
+            case c : Constructor => methodParams(c.valueParams)
+            case _ => ""
+         }
+      }
 
-	/**
-	 * Returns list of params.
-	 *
-	 * TODO add generic handling
-	 */
-   @deprecated
-	def methodParams(valueParams : List[List[ValueParam]]) = {
-		var paramsTypes = Nil:List[String]
-		valueParams.foreach(params => params.foreach(
-				param => paramsTypes ::= param.resultType.name
-			)
-		)
-		"(" + paramsTypes.mkString(",") + ")"
-	}
+      /**
+       * Returns list of params.
+       *
+       * TODO add generic handling
+       */
+      @deprecated
+      def methodParams(valueParams : List[List[ValueParam]]) = {
+         var paramsTypes = Nil:List[String]
+         valueParams.foreach(params => params.foreach(
+            param => paramsTypes ::= param.resultType.name
+         )
+         )
+         "(" + paramsTypes.mkString(",") + ")"
+      }
 
-	/**
-	 * Returns name of the entity. In case of methods and constructors appends parameters
-	 * to the name.
-	 */
-   @deprecated
-	def entityName(entity : MemberEntity) = {
-		if (entity.isConstructor || entity.isDef)
-			entity.name + params(entity.asInstanceOf[NonTemplateMemberEntity])
-		else
-			entity.name
-	}
+      /**
+       * Returns name of the entity. In case of methods and constructors appends parameters
+       * to the name.
+       */
+      @deprecated
+      def entityName(entity : MemberEntity) = {
+         if (entity.isConstructor || entity.isDef)
+            entity.name + params(entity.asInstanceOf[NonTemplateMemberEntity])
+         else
+            entity.name
+      }
 
 }

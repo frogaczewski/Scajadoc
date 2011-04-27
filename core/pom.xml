@@ -85,10 +85,9 @@
 				<artifactId>scajadoc-maven-plugin</artifactId>
 				<version>0.1-SNAPSHOT</version>
 				<configuration>
-					<destination>C:\Users\Filip\Desktop\PracaDyplomowa\Testing\te</destination>
 					<scalaVersion>2.8.1</scalaVersion>
 				</configuration>
-			</plugin>-->
+			</plugin>   -->
 
 			<plugin>
 				<groupId>org.scala-tools</groupId>

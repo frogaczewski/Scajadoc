@@ -86,7 +86,6 @@
 				<artifactId>maven</artifactId>
 				<version>0.1-SNAPSHOT</version>
 				<configuration>
-					<projectName>project name</projectName>
 					<destination>destination</destination>
 					<scalaVersion>2.8.1</scalaVersion>
 				</configuration>

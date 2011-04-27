@@ -27,6 +27,7 @@ class FrontEndBuilder(val universe : Universe) {
       pages += new OverviewFramePage(universe.rootPackage)
       pages += new OverviewSummaryPage(universe.rootPackage)
       pages += new ConstantValuesPage(universe.rootPackage)
+      pages += new OverviewTreePage(universe.rootPackage)
 		pages.toList
 	}
 

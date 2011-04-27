@@ -57,7 +57,12 @@ trait NavigationBarHtmlUtil {
 
                      }
                      <!--<td bgcolor="#EEEEFF" class="NavBarCell1"><a href="class-use/.html"><font class="NavBarFont1"><b>Use</b></font></a></td> -->
-                     <td bgcolor="#EEEEFF" class="NavBarCell1"><a href="package-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+                     {
+                        if (packageTree)
+                           <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Tree</b></font></td>
+                        else
+                           <td bgcolor="#EEEEFF" class="NavBarCell1"><a href="package-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+                     }
                      {
                         if (deprecated)
                            <td bgcolor="#FFFFFF" class="NavBarCell1Rev"><font class="NavBarFont1Rev"><b>Deprecated</b></font></td>
@@ -92,7 +97,7 @@ trait NavigationBarHtmlUtil {
                      </font>
                   </td>
                else
-                  <td bgcolor="white" class="NavBarCell2"></td>
+                  <td bgcolor="white" class="NavBarCell2">&nbsp;</td>
             }
             <td bgcolor="white" class="NavBarCell2">
                <font size="-2">

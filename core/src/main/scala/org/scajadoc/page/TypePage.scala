@@ -185,10 +185,6 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
 
    private def tags() = entityPresentationUtil.tags(template.comment)
 
-   private def footer() = {
-
-   }
-
    /**
     * Creates a list of field summaries.
     */
@@ -358,7 +354,7 @@ object typePageHtmlUtil extends NavigationBarHtmlUtil {
       if (inhMethods.isEmpty)
           NodeSeq.Empty
       else {
-         <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+         <p><table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
             <tr bgcolor="#EEEEFF" class="TableSubHeadingColor">
                <th align="left"><b>{inheritedType} inherited from class {from.qualifiedName}</b></th>
             </tr>
@@ -366,7 +362,7 @@ object typePageHtmlUtil extends NavigationBarHtmlUtil {
                <td>{extractsToHtmlLinks(inhMethods, tmp)}
                </td>
             </tr>
-         </table>
+         </table></p>
       }
    }
 

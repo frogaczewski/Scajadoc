@@ -20,13 +20,11 @@ Building and executing Scajadoc.
 				<artifactId>scajadoc-maven-plugin</artifactId>
 				<version>0.1-SNAPSHOT</version>
 				<configuration>
-					<destination>path to the target directory</destination>
 					<scalaVersion>2.8.1</scalaVersion>
 				</configuration>
 			</plugin>
 
 			and execute:
 			
-			mvn org.scajadoc:scajadoc-maven-plugin:scajadoc (TODO shorten this)
+			mvn scajadoc:run (TODO change it)
 			TODO automatic discovery of scala version
-			TODO destination = target/api
