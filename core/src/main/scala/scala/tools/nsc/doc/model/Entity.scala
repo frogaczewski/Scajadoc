@@ -135,6 +135,8 @@ trait Constructor extends NonTemplateMemberEntity {
 /** A value (`val`), lazy val (`lazy val`) or variable (`var`) of a
   * ''documentable'' class, trait or object. */
 trait Val extends NonTemplateMemberEntity {
+   def isFinal : Boolean
+   def settersAndGetters : Boolean
 }
 
 trait ConstantVal extends Val {

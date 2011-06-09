@@ -14,7 +14,8 @@ import symtab.Flags
 import model.{ RootPackage => RootPackageEntity }
 
 /** This trait extracts all required information for documentation from compilation units */
-class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory: ModelFactory with CommentFactory with TreeFactory =>
+class
+ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory: ModelFactory with CommentFactory with TreeFactory =>
 
   import global._
   import definitions._
@@ -31,7 +32,9 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       (definitions.getClass("scala.remote") -> definitions.getClass("java.rmi.Remote")),
       (definitions.getClass("scala.serializable") -> definitions.getClass("java.io.Serializable"))
    )
-  
+
+   lazy val beanPropertyAnnotation = definitions.getClass("scala.reflect.BeanProperty")
+
   /**  */
   def makeModel: Universe = {
     val universe = new Universe { thisUniverse =>
@@ -417,21 +420,29 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
                }
             }
             override def isVal = true
+            override def isFinal = bSym.isFinal
+            override def settersAndGetters = bSym.hasAnnotation(beanPropertyAnnotation)
          })
 	   }
        /* handles functions */
       else if (bSym.isGetter && bSym.tpe.isInstanceOf[PolyType] && checkFunctionType(bSym.tpe.asInstanceOf[PolyType])) {
          Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
             override def isFunction = true
+            override def isFinal = bSym.isFinal
+            override def settersAndGetters = bSym.hasAnnotation(beanPropertyAnnotation)
          })
       }
       else if (bSym.isGetter && bSym.isLazy)
         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
           override def isLazyVal = true
+           override def isFinal = bSym.isFinal
+           override def settersAndGetters = bSym.hasAnnotation(beanPropertyAnnotation)
         })
       else if (bSym.isGetter && bSym.accessed.isMutable)
         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
           override def isVar = true
+          override def isFinal = bSym.isFinal
+           override def settersAndGetters = bSym.hasAnnotation(beanPropertyAnnotation)
         })
       else if (bSym.isMethod && !bSym.isGetterOrSetter && !bSym.isConstructor && !bSym.isModule)
         Some(new NonTemplateParamMemberImpl(bSym, inTpl) with HigherKindedImpl with Def {
@@ -445,6 +456,8 @@ class ModelFactory(val global: Global, val settings: doc.Settings) { thisFactory
       else if (bSym.isGetter) { // Scala field accessor or Java field
         Some(new NonTemplateMemberImpl(bSym, inTpl) with Val {
           override def isVal = true
+          override def isFinal = bSym.isFinal
+           override def settersAndGetters = bSym.hasAnnotation(beanPropertyAnnotation)
         })
       } else if (bSym.isAbstractType)
         Some(new NonTemplateMemberImpl(bSym, inTpl) with TypeBoundsImpl with HigherKindedImpl with AbstractType {

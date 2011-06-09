@@ -41,8 +41,10 @@ object settings extends Settings(msg => error(msg)) {
     */
 	var javadocTitle : String = _
 
-	def setSourcepath(sourcepath : List[String]) =
-		this.sourcepath.value.split(File.pathSeparatorChar).flatMap{ p => sourcepath }.toList
+	def setSourcepath(sourcepath : List[String]) = {
+//		this.sourcepath.value.split(File.pathSeparatorChar).flatMap{ p => sourcepath }.toList
+      this.sourcepath.value = sourcepath.mkString("", File.pathSeparator, "")
+   }
 
 	def setClasspath(classpath : String) = this.classpath.value = classpath
 
@@ -97,7 +99,7 @@ object DocSettings {
 		val opt = new Options
 		opt.addOption("sourcepath", true, "Specifies the search paths for finding source files (.scala)")
 		opt.addOption("d", true, "Specifies the destination directory where javadoc saves the generated HTML files.")
-		opt.addOption("classpath", true, "Specifies the paths where javadoc will look for referenced classes (.class files) ")
+		opt.addOption("classpath", true, "Specifies the paths where ScajaDoc will look for referenced classes (.class files) ")
 		opt.addOption("doctitle", true, "Specifies the title to be placed near the top of the overview summary file.")
       val linkOption = new CliOption("link", true, "Creates links to existing javadoc-generated documentation of external referenced classes. As an argument it takes link or links to external javadoc documentations.")
       linkOption.setArgs(CliOption.UNLIMITED_VALUES)
@@ -107,7 +109,7 @@ object DocSettings {
 
 	/** Returns list of source files to compile. */
 	def getSources(file : File) : List[String] = {
-		(new Directory(file)).deepFiles.filter{ _.extension == "scala" }.map{ _.path }.toList
+		(new Directory(file)).deepFiles.filter{ e => (e.extension == "scala" || e.extension == "java")}.map{ _.path }.toList
 	}
 
 	def getDestinationDir(dir : String) : Option[String] = {
@@ -142,7 +144,7 @@ class DocSettings {
 	 * Processes command line arguments and finds options values.
 	 */
 	private def processOptions(options : Options, args : Array[String]) = {
-		/** Retrieve path to scala library using system environmental settings. */
+		/** Retrieve path to the scala library using system environmental settings. */
 		def scalaClasspath() : List[String] = {
 			val scalaLib = System.getenv("SCALA_HOME") + "\\lib"
 			List(

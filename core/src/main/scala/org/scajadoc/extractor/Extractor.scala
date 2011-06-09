@@ -79,6 +79,8 @@ trait MemberExtract extends Extract {
    def isInherited : Boolean
 
    def inTemplate : DocTemplateEntity
+
+   def isExecutable : Boolean
 }
 
 /**

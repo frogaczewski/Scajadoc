@@ -30,6 +30,9 @@ object Scajadoc {
 		settings.setSourcepath(docSettings.sourcepath)
 		settings.setJavadocTitle(docSettings.javadocTitle)
       settings.setLinks(docSettings.links)
+      println("source path " + docSettings.sourcepath)
+      println("source path " + settings.sourcepath)
+      println("classpath " + settings.classpath + " \n\n\n")
 		val reporter = new ConsoleReporter(settings) {
 			override def hasErrors = false
 		}

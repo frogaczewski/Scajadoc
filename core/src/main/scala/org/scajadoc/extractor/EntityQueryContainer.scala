@@ -80,8 +80,14 @@ object entityQueryContainer {
     */
    val isFunction : (MemberEntity => Boolean) = m => m.isFunction
 
+   /**
+    * TODO reimplement
+    */
+   val isGetter : (MemberEntity => Boolean) =
+      m => m.isInstanceOf[Val]
+
    val isMethod : (MemberEntity => Boolean) =
-      (m : MemberEntity) => m.isDef || isFunction(m) && !isConstructor(m)
+      (m : MemberEntity) => m.isDef || isFunction(m) || isGetter(m) && !isConstructor(m)
 
    val isConstructor : (MemberEntity => Boolean) = m => m.isConstructor
 

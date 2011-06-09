@@ -1,6 +1,7 @@
 package org.scajadoc.extractor
 
 import tools.nsc.doc.model._
+import collection.mutable.ListBuffer
 
 /**
  * Class for extracting data of interfaces, classes, annotations, enums
@@ -39,7 +40,15 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
          else
             "class"
       }
-      def superClasses = info.linearizationTemplates.filter(!_.isTrait).reverse.tail
+      def superClasses = {
+         val scls = info.linearizationTemplates.filter(!_.isTrait)
+         if (scls != Nil)
+            info.linearizationTemplates.filter(!_.isTrait).reverse.tail
+         else Nil
+         /*val rev = x.reverse
+         val result = rev.tail
+         result */
+      }
       def interfaces = {
          val interfaces = new collection.mutable.HashSet[TemplateEntity]
          def addNonDuplicate(tmp : TemplateEntity) = {
@@ -74,7 +83,7 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
       }
       def subclasses = info.subClasses.filter(!_.isTrait)
       def subinterfaces = info.subClasses.filter(_.isTrait)
-      def directSuperclass = superClasses.last
+      def directSuperclass = if (superClasses != Nil) superClasses.last else null
       def isClass = !isInterface && !isEnum
       def isInterface = entityQueryContainer.isInterface(info)
       def isEnum = isEnumeration(info)
@@ -91,9 +100,15 @@ class TypeExtractor extends Extractor[DocTemplateEntity, TypeExtract] {
                }
             }).filter(_.isDefined).map(_.get)
          }
+         def gettersAndSetters(ent : DocTemplateEntity) = {
+            ent.members.filter(isField).map(e => e.asInstanceOf[Val])
+                  .map(methodExtractor.extract(_))
+                  .filter(_.isDefined).map(_.get)
+
+         }
          info.companion match {
-            case Some(companion) => entMethods(info) ++ entMethods(companion)
-            case None => entMethods(info)
+            case Some(companion) => entMethods(info) ++ entMethods(companion) /*++ gettersAndSetters(info) */
+            case None => entMethods(info) /*++ gettersAndSetters(info) */
          }
       }
 

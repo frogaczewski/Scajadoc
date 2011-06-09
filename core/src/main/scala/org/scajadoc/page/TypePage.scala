@@ -172,7 +172,7 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
          var signature = Nil:List[Node]
          // sinature ++= annotations
          signature ++= headline
-         if (extract.isClass || extract.isEnum) {
+         if ((extract.isClass || extract.isEnum) && extract.directSuperclass != null) {
             signature ++= <br/>
             signature ++= <xml:node>extends </xml:node>
             signature ++= typePageHtmlUtil.templateLinkToHtml(extract.directSuperclass, template)
@@ -236,7 +236,7 @@ class TypePage(val template : DocTemplateEntity) extends HtmlPage {
    }
 
    private def constructorsDetail(constructors : List[MethodExtract]) : NodeSeq = {
-      NodeSeq.Empty
+      typePageHtmlUtil.detailsToHtml(constructors, "Constructor Detail", template)
    }
 
 }
@@ -390,7 +390,10 @@ object typePageHtmlUtil extends NavigationBarHtmlUtil {
 
    def detailToHtml(extract : MemberExtract, from : DocTemplateEntity) : NodeSeq = {
       def signature(extract : MemberExtract) = {
-         "signature"
+         if (extract.isExecutable)
+            extract.allocation + " " + extract.typ + extract.asInstanceOf[MethodExtract].parameters
+         else
+            extract.allocation + " " + extract.typ
       }
       <a name={extract.name}><!-- --></a>
       <h3>{extract.name}</h3>

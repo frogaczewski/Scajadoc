@@ -1,6 +1,6 @@
 package org.scajadoc.extractor
 
-import tools.nsc.doc.model.{TemplateEntity, DocTemplateEntity, NonTemplateMemberEntity}
+import tools.nsc.doc.model._
 
 /**
  * Class for extracting java information from both: defs and vals.
@@ -36,6 +36,10 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
          Some(new MethodExtractImpl(info))
       else if (!anyRefMethods.contains(info.rawName))
          Some(new InheritedMethodExtractImpl(info))
+      else if (info.isInstanceOf[Val] && info.asInstanceOf[Val].settersAndGetters)
+         Some(new GetterMethodExtractImpl(info))
+      else if (info.isInstanceOf[Val] && !info.asInstanceOf[Val].settersAndGetters)
+         Some(new MethodExtractImpl(info))
       else
          None
    }
@@ -51,7 +55,12 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
        * TODO change to typeextractor
        */
       def typ = {
-         info.resultType.name
+         val typ = info.resultType
+         val rsn = info.resultType.name
+         if (info.resultType.name.equalsIgnoreCase("unit"))
+            "void"
+         else
+            info.resultType.name
       }
 
       def entity = info
@@ -59,15 +68,41 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
       def isInherited = false
 
       def inTemplate = info.inTemplate
+
+      def isExecutable = true
+
+      def parameters = {
+         def makeParam(v : ValueParam) = {
+            if (v.isFunction)
+               v.asInstanceOf[FunctionParam].funType.name
+            else {
+               val x = v.resultType + " " + v.name
+               x
+            }
+         }
+         def makeParams(params : List[List[ValueParam]]) =
+            "(" + params.flatten.map(makeParam(_)).mkString(", ") + ")"
+         if (info.isInstanceOf[Def])
+            makeParams(info.asInstanceOf[Def].valueParams)
+         else if (info.isInstanceOf[Constructor])
+            makeParams(info.asInstanceOf[Constructor].valueParams)
+         else
+            "()"
+      }
    }
 
    class ConstructorExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) with ConstructorExtract {
       override def name = info.inTemplate.rawName
+      override def typ =  info.inTemplate.rawName
    }
 
    class InheritedMethodExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) with InheritedMember {
       override def isInherited = true
       def inDefinitionTemplates = info.inDefinitionTemplates
+   }
+
+   class GetterMethodExtractImpl(info : NonTemplateMemberEntity) extends MethodExtractImpl(info) {
+      override def name = "get" + info.rawName.capitalize
    }
 
 }
@@ -78,7 +113,7 @@ class MethodExtractor extends Extractor[NonTemplateMemberEntity, MethodExtract] 
  * @author Filip Rogaczewski
  */
 trait MethodExtract extends MemberExtract {
-
+   def parameters : String
 }
 
 trait ConstructorExtract extends MethodExtract

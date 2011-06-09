@@ -38,6 +38,8 @@ class FieldExtractor extends Extractor[Val, FieldExtract] {
       def isInherited = false
 
       def inTemplate = info.inTemplate
+
+      def isExecutable = false
    }
 
    class InheritedFieldImpl(info : Val) extends FieldExtractImpl(info) with InheritedMember {
